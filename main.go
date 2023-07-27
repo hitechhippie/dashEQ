@@ -10,7 +10,13 @@ import (
 	"os"
 	"runtime"
 	"text/template"
+	"time"
 )
+
+var eqDBConnection *eqdb.Connection
+var dataSets []eqobject.DataSet
+var zoneSet []eqobject.Zone
+var npcSet []eqobject.NPC
 
 func main() {
 	// configuration file location
@@ -33,40 +39,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	zoneSet, err := loadDataSetsZones(eqDBConnection)
+	// call the main data set load function and populate the data sets
+	zoneSet, npcSet, dataSets, err = loadDataSetsAll(eqDBConnection)
 	if err != nil {
-		fmt.Println("![DB] Zone load error:", err)
+		fmt.Println("![DB] Data set load error:", err)
 		os.Exit(1)
 	}
 	fmt.Println("*[DB] Loaded", len(zoneSet), "zones.")
-
-	npcSet, err := loadDataSetsNPCs(eqDBConnection)
-	if err != nil {
-		fmt.Println("![DB] NPC load error:", err)
-		os.Exit(1)
-	}
 	fmt.Println("*[DB] Loaded", len(npcSet), "NPCs.")
 
-	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		log.Println("request received from", req.RemoteAddr+":", req.RequestURI)
+	// set up the primary web handling function for web requests
+	http.HandleFunc("/", webContextHandler)
 
-		if req.RequestURI == "/" || req.RequestURI == "/index.html" {
-			tmpl, err := template.ParseFiles("./static/html/templates/index.html")
-			if err != nil {
-				fmt.Println("! Error processing HTML template request:", err)
-				os.Exit(1)
-			}
-			tmpl.Execute(w, zoneSet)
-		} else if req.RequestURI == "/?reload-data-sets" {
-			zoneSet, npcSet, err = loadDataSetsAll(eqDBConnection)
-			fmt.Println("*[DB] Loaded", len(zoneSet), "zones.")
-			fmt.Println("*[DB] Loaded", len(npcSet), "NPCs.")
-			http.Redirect(w, req, "/", http.StatusMovedPermanently)
-		} else {
-			http.ServeFile(w, req, "./static/html"+req.URL.Path)
-		}
-	})
-
+	// print server status message in console
 	printStatus(dashEQConfig)
 
 	err = http.ListenAndServe(dashEQConfig.WebAddr+":"+dashEQConfig.WebPort, nil)
@@ -155,7 +140,24 @@ func loadDataSetsNPCs(c *eqdb.Connection) ([]eqobject.NPC, error) {
 	npcRows, err := c.Target.Query("SELECT " +
 		"id," + //Id uint32
 		"name," + //Name string
-		"level " + //Level uint8
+		"level, " + //Level uint8
+		"race, " + //uint16
+		"class, " + //uint8
+		"hp, " + //uint32
+		"mana, " + //uint32
+		"loottable_id, " + //uint32
+		"npc_spells_id, " + //uint16
+		"npc_faction_id, " + //uint16
+		"mindmg, " + //uint16
+		"maxdmg, " + //uint16
+		"attack_count, " + //uint16
+		"runspeed, " + //float32
+		"MR, " + //uint16
+		"CR, " + //uint16
+		"DR, " + //uint16
+		"FR, " + //uint16
+		"PR, " + //uint16
+		"AC " + //uint16
 		"FROM npc_types")
 	if err != nil {
 		return nil, err
@@ -167,24 +169,29 @@ func loadDataSetsNPCs(c *eqdb.Connection) ([]eqobject.NPC, error) {
 	// iterate through the raw npc query data and populate the return object
 	for npcRows.Next() {
 		npc := new(eqobject.NPC)
-		npcRows.Scan(&npc.Id, &npc.Name, &npc.Level)
+		npcRows.Scan(&npc.Id, &npc.Name, &npc.Level, &npc.Race, &npc.Class, &npc.HP, &npc.Mana, &npc.LootTable, &npc.NPCSpells, &npc.NPCFaction, &npc.MinDmg, &npc.MaxDmg, &npc.AttackCount, &npc.RunSpeed, &npc.MR, &npc.CR, &npc.DR, &npc.FR, &npc.PR, &npc.AC)
 		npcSet = append(npcSet, *npc)
 	}
 	return npcSet, nil
 }
 
-func loadDataSetsAll(c *eqdb.Connection) ([]eqobject.Zone, []eqobject.NPC, error) {
+func loadDataSetsAll(c *eqdb.Connection) ([]eqobject.Zone, []eqobject.NPC, []eqobject.DataSet, error) {
+
+	dataSets := make([]eqobject.DataSet, 0)
+
 	zone, err := loadDataSetsZones(c)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
+	dataSets = append(dataSets, eqobject.DataSet{Name: "Zones", Count: uint32(len(zone)), LoadTime: time.Now().String()})
 
 	npcs, err := loadDataSetsNPCs(c)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
+	dataSets = append(dataSets, eqobject.DataSet{Name: "NPCs", Count: uint32(len(npcs)), LoadTime: time.Now().String()})
 
-	return zone, npcs, nil
+	return zone, npcs, dataSets, nil
 }
 
 func printStatus(c *config.ServerConfig) {
@@ -200,4 +207,38 @@ func printStatus(c *config.ServerConfig) {
 	fmt.Println("" +
 		"*** DashEQ Listening for Requests on: " + c.WebAddr + ":" + c.WebPort + " ***")
 	fmt.Println()
+}
+
+func webContextHandler(w http.ResponseWriter, req *http.Request) {
+
+	log.Println("request received from", req.RemoteAddr+":", req.RequestURI)
+
+	switch req.RequestURI {
+	case "/", "/index.html":
+		tmpl, err := template.ParseFiles("./static/html/templates/index.html")
+		if err != nil {
+			fmt.Println("! Web processing error:", err)
+		}
+		tmpl.Execute(w, dataSets)
+	case "/zones.html":
+		tmpl, err := template.ParseFiles("./static/html/templates/zones.html")
+		if err != nil {
+			fmt.Println("! Web processing error:", err)
+		}
+		tmpl.Execute(w, zoneSet)
+	case "/npcs.html":
+		tmpl, err := template.ParseFiles("./static/html/templates/npcs.html")
+		if err != nil {
+			fmt.Println("! Web processing error:", err)
+		}
+		tmpl.Execute(w, npcSet)
+	case "/?reload-data-sets":
+		zoneSet, npcSet, dataSets, _ = loadDataSetsAll(eqDBConnection)
+
+		fmt.Println("*[DB] Loaded", len(zoneSet), "zones.")
+		fmt.Println("*[DB] Loaded", len(npcSet), "NPCs.")
+		http.Redirect(w, req, "/", http.StatusMovedPermanently)
+	default:
+		http.ServeFile(w, req, "./static/html"+req.URL.Path)
+	}
 }
