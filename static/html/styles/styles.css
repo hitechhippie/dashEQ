@@ -1,0 +1,148 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f0f7fc;
+    color: #333;
+
+    /* Add background image with faded effect and fixed position */
+    background-image: linear-gradient(rgba(240, 247, 252, 0.8), rgba(240, 247, 252, 0.8)), url('/images/battle.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+p {
+    line-height: 1.6;
+}
+
+.sidebar {
+    float: left;
+    background: #007bff; /* Light blue for the sidebar */
+    color: #333;
+    padding: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-top: 150px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: fixed;
+}
+
+.persistent-links {
+    margin-bottom: 20px;
+}
+
+.link-list {
+    list-style: none;
+    padding: 0;
+}
+
+.link-list li {
+    margin-bottom: 5px;
+}
+
+.link-list a {
+    color: #fff; /* White color for the sidebar links */
+    text-decoration: none;
+}
+
+.link-list a:hover {
+    text-decoration: underline;
+}
+
+.main-content {
+    margin-left: 120px; /* Leave space for the sidebar */
+    margin-bottom: 120px; /* Leave space for the bottombar */
+    padding: 10px;
+}
+
+.titlebar {
+    max-width: 800px;
+    padding: 10px;
+    background: #fff; /* White background for the content area */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle elevation effect */
+}
+
+.title {
+    padding: 10px;
+    text-align: left; /* Center the title horizontally */
+    color: #007bff; /* Light blue for the heading */
+}
+
+.titlesub {
+    padding: 10px;
+    text-align: left; /* Center the title horizontally */
+    color: #007bff; /* Light blue for the heading */
+}
+
+.table-container {
+    padding: 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px; /* Add top margin for spacing */
+}
+
+.data-table th, .data-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ccc; /* Add a horizontal border between rows */
+}
+
+.data-table th {
+    background-color: #007bff; /* Light blue for the table header */
+    color: #fff; /* White text color for the table header */
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f0f7fc; /* Light blue shade for even rows */
+}
+
+.data-table tbody tr:hover {
+    background-color: #cce5ff; /* Lighter blue shade on hover */
+}
+
+.bottombar-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #007bff; /* Light blue for the bottombar container */
+    padding: 10px;
+    color: #fff; /* White text color for the bottombar links */
+    justify-content: center;
+}
+
+.bottombar-banner {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: left;
+}
+
+.bottombar-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Center the bottombar links horizontally */
+}
+
+.bottombar-list li {
+    margin-right: 5px;
+}
+
+.bottombar-list li:last-child {
+    margin-right: 0;
+}
+
+.bottombar-list a {
+    color: #fff; /* White color for the bottombar links */
+    text-decoration: none;
+}
+
+.bottombar-list a:hover {
+    text-decoration: underline;
+}

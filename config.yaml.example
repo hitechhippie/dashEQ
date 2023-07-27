@@ -1,0 +1,9 @@
+---
+DBuser: ""
+DBpass: ""
+DBnet: "tcp"
+DBaddr: ""
+DBport: "3306"
+DBname: "eqemu"
+WebAddr: "0.0.0.0"
+WebPort: "8080"
