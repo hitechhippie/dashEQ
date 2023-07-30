@@ -34,6 +34,13 @@ func Connect(c *ConnectionConfig) (*Connection, error) {
 	var database Connection
 
 	mysqldb, err = sql.Open("mysql", cfg.FormatDSN())
+	if err != nil {
+		return nil, err
+	}
+	err = mysqldb.Ping()
+	if err != nil {
+		return nil, err
+	}
 
 	database.Target = mysqldb
 

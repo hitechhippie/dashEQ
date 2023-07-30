@@ -7,14 +7,15 @@ import (
 )
 
 type ServerConfig struct {
-	DBuser  string `yaml:"DBuser"`
-	DBpass  string `yaml:"DBpass"`
-	DBnet   string `yaml:"DBnet"`
-	DBaddr  string `yaml:"DBaddr"`
-	DBport  string `yaml:"DBport"`
-	DBname  string `yaml:"DBname"`
-	WebAddr string `yaml:"WebAddr"`
-	WebPort string `yaml:"WebPort"`
+	DBuser   string `yaml:"DBuser"`
+	DBpass   string `yaml:"DBpass"`
+	DBnet    string `yaml:"DBnet"`
+	DBaddr   string `yaml:"DBaddr"`
+	DBport   string `yaml:"DBport"`
+	DBname   string `yaml:"DBname"`
+	WebAddr  string `yaml:"WebAddr"`
+	WebPort  string `yaml:"WebPort"`
+	QuestDir string `yaml:"QuestDir"`
 }
 
 func LoadConfigFromYAML(f string) (*ServerConfig, error) {

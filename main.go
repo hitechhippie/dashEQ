@@ -4,6 +4,7 @@ import (
 	"dasheq/internal/config"
 	eqdb "dasheq/internal/db"
 	eqobject "dasheq/internal/eqobjects"
+	"dasheq/internal/eqquests"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,6 +18,8 @@ var eqDBConnection *eqdb.Connection
 var dataSets []eqobject.DataSet
 var zoneSet []eqobject.Zone
 var npcSet []eqobject.NPC
+var questNPCset *[]eqquests.QuestNPC
+var questHearSet *[]eqquests.QuestHear
 
 func main() {
 	// configuration file location
@@ -42,11 +45,32 @@ func main() {
 	// call the main data set load function and populate the data sets
 	zoneSet, npcSet, dataSets, err = loadDataSetsAll(eqDBConnection)
 	if err != nil {
-		fmt.Println("![DB] Data set load error:", err)
+		fmt.Println("! [DB] Data set load error:", err)
 		os.Exit(1)
 	}
-	fmt.Println("*[DB] Loaded", len(zoneSet), "zones.")
-	fmt.Println("*[DB] Loaded", len(npcSet), "NPCs.")
+	fmt.Println("* [DB] Loaded", len(zoneSet), "zones.")
+	fmt.Println("* [DB] Loaded", len(npcSet), "NPCs.")
+
+	questNPCset, err = eqquests.LoadDataQuestNPCs(dashEQConfig.QuestDir, &zoneSet, &npcSet)
+	if err != nil {
+		fmt.Println("! Quest NPC load error:", err)
+		os.Exit(1)
+	}
+	fmt.Println("* [Quest] Loaded", len(*questNPCset), "quest NPCs.")
+
+	questHearSet, err = eqquests.LoadDataQuestHears(questNPCset)
+	if err != nil {
+		fmt.Println("! Quest hear set load error:", err)
+		os.Exit(1)
+	}
+	fmt.Println("* [Quest] Loaded", len(*questHearSet), "quest hear/response statements.")
+
+	for _, data := range *questHearSet {
+		if data.QuestNPCId == 55179 {
+			fmt.Println(".. player says " + data.Hears)
+			fmt.Println(".. NPC says " + data.Says)
+		}
+	}
 
 	// set up the primary web handling function for web requests
 	http.HandleFunc("/", webContextHandler)
@@ -119,9 +143,6 @@ func loadDataSetsZones(c *eqdb.Connection) ([]eqobject.Zone, error) {
 		return nil, err
 	}
 
-	// not sure the purpose of this defer
-	// defer rows.Close()
-
 	// iterate through the raw zone query data and populate the return object
 	for zoneRows.Next() {
 		zone := new(eqobject.Zone)
@@ -162,9 +183,6 @@ func loadDataSetsNPCs(c *eqdb.Connection) ([]eqobject.NPC, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// not sure the purpose of this defer
-	// defer rows.Close()
 
 	// iterate through the raw npc query data and populate the return object
 	for npcRows.Next() {
@@ -232,6 +250,12 @@ func webContextHandler(w http.ResponseWriter, req *http.Request) {
 			fmt.Println("! Web processing error:", err)
 		}
 		tmpl.Execute(w, npcSet)
+	case "/questnpcs.html":
+		tmpl, err := template.ParseFiles("./static/html/templates/questnpcs.html")
+		if err != nil {
+			fmt.Println("! Web processing error:", err)
+		}
+		tmpl.Execute(w, questNPCset)
 	case "/?reload-data-sets":
 		zoneSet, npcSet, dataSets, _ = loadDataSetsAll(eqDBConnection)
 

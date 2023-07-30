@@ -10,6 +10,14 @@
 *.so
 *.dylib
 
+# Ignore the static quests folder - these are server-specific
+static/quests/**
+!static/quests/README.md
+
+# Ignore logs folder contents
+logs/**
+!logs/README.md
+
 # Test binary, built with `go test -c`
 *.test
 
