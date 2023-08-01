@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"runtime"
 	"strconv"
@@ -288,24 +287,22 @@ func webContextHandler(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "/", http.StatusMovedPermanently)
 		}
 	default:
-		query, _ := url.ParseQuery(req.URL.Opaque)
 		if strings.Contains(req.RequestURI, "questnpcid=") {
-			idUint64, _ := strconv.ParseUint(query.Get("questnpcid"), 10, 64)
+			query := req.URL.Query().Get("questnpcid")
+			idUint64, _ := strconv.ParseUint(query, 10, 64)
 			idUint32 := uint32(idUint64)
-			fmt.Println(req.RequestURI)
-			fmt.Println(query.Get("questnpcid"))
-			fmt.Println(idUint64)
-			fmt.Println(idUint32)
 
 			var qNpcHearSubset []eqquests.QuestHear
-			tmplIntermediate.Execute(&buf, webtemplates.QuestNPCdetail)
 			for _, data := range questHearSet {
 				if data.QuestNPCId == idUint32 {
 					qNpcHearSubset = append(qNpcHearSubset, data)
 				}
 			}
+			tmplIntermediate.Execute(&buf, webtemplates.QuestNPCdetail)
 			tmpl := template.Must(template.New("").Parse(buf.String()))
 			tmpl.Execute(w, qNpcHearSubset)
+		} else {
+			http.ServeFile(w, req, "./static/html"+req.URL.Path)
 		}
 	}
 }

@@ -35,8 +35,13 @@ const (
                         <td>{{ .Id }}</td>
                         <td>{{ .Short_name }}</td>
                         <td>{{ .Long_name }}</td>
-                        <td>{{ .Outdoor }}</td>
-                        <td>{{ .Expansion }}</td>
+                        <td>{{ if eq .Outdoor 1 }}Yes{{ else }}No{{ end }}</td>
+                        <td>{{ if eq .Expansion 1 }}Original</td>
+                            {{ else if eq .Expansion 2 }}Ruins of Kunark</td>
+                            {{ else if eq .Expansion 3 }}Scars of Velious</td>
+                            {{ else if eq .Expansion 4 }}Shadows of Luclin</td>
+                            {{ else if eq .Expansion 5 }}Planes of Power</td>
+                            {{ else }}Unknown</td>{{ end }}
                     </tr>{{end}}`
 )
 
@@ -54,7 +59,7 @@ const (
                 </thead>
                 <tbody>{{range .}}
                     <tr>
-                        <td>{{ .Id }}</td>
+                        <td><a href=/?questnpcid={{ .Id }}>{{ .Id }}</a></td>
                         <td>{{ .Name }}</td>
                         <td>{{ .Zone }}</td>
                         <td>{{ .File }}</td>
@@ -63,7 +68,7 @@ const (
 
 const (
 	QuestNPCdetail = `                <tr>
-                        <th>{{ .QuestNPCName }}</th>
+                        <th>Quest NPC Detail</th>
                     </tr>
                     <tr>
                         <th>Player Says</th>
@@ -72,8 +77,9 @@ const (
                 </thead>
                 <tbody>{{range .}}
                     <tr>
-                        <td>{{ .Hears }}</td>
-                        <td>{{ .Says }}</td>
+                        <td>{{ .QuestNPCName }} hears, "{{ .Hears }}"</td>
+                        <td>{{ .QuestNPCName }} responds, "{{ .Says }}"</td>
                     </tr>{{end}}
-    `
+                    <tr>
+                        <td><a href="javascript:history.back()">< back ></a></td>`
 )
