@@ -57,7 +57,7 @@ func LoadDataQuestNPCs(d string, zoneSet *[]eqobjects.Zone, npcSet *[]eqobjects.
 	// setup logging vars to log this load run
 	var logBuf bytes.Buffer
 	logQuest := log.New(&logBuf, "quest loader: ", log.Lshortfile)
-	logFile, err := os.OpenFile("./logs/dashEQ-questloader.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile("./logs/questloader.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return nil, err
 	}

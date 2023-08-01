@@ -1,25 +1,31 @@
 package main
 
 import (
+	"bytes"
 	"dasheq/internal/config"
 	eqdb "dasheq/internal/db"
 	eqobject "dasheq/internal/eqobjects"
 	"dasheq/internal/eqquests"
+	webtemplates "dasheq/internal/webtemplates"
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
+	"strconv"
+	"strings"
 	"text/template"
 	"time"
 )
 
 var eqDBConnection *eqdb.Connection
+var dashEQConfig *config.ServerConfig
 var dataSets []eqobject.DataSet
 var zoneSet []eqobject.Zone
 var npcSet []eqobject.NPC
-var questNPCset *[]eqquests.QuestNPC
-var questHearSet *[]eqquests.QuestHear
+var questNPCset []eqquests.QuestNPC
+var questHearSet []eqquests.QuestHear
 
 func main() {
 	// configuration file location
@@ -43,34 +49,15 @@ func main() {
 	}
 
 	// call the main data set load function and populate the data sets
-	zoneSet, npcSet, dataSets, err = loadDataSetsAll(eqDBConnection)
+	zoneSet, npcSet, questNPCset, questHearSet, dataSets, err = loadDataSetsAll(eqDBConnection, *dashEQConfig)
 	if err != nil {
-		fmt.Println("! [DB] Data set load error:", err)
+		fmt.Println("! Data set load error:", err)
 		os.Exit(1)
 	}
 	fmt.Println("* [DB] Loaded", len(zoneSet), "zones.")
 	fmt.Println("* [DB] Loaded", len(npcSet), "NPCs.")
-
-	questNPCset, err = eqquests.LoadDataQuestNPCs(dashEQConfig.QuestDir, &zoneSet, &npcSet)
-	if err != nil {
-		fmt.Println("! Quest NPC load error:", err)
-		os.Exit(1)
-	}
-	fmt.Println("* [Quest] Loaded", len(*questNPCset), "quest NPCs.")
-
-	questHearSet, err = eqquests.LoadDataQuestHears(questNPCset)
-	if err != nil {
-		fmt.Println("! Quest hear set load error:", err)
-		os.Exit(1)
-	}
-	fmt.Println("* [Quest] Loaded", len(*questHearSet), "quest hear/response statements.")
-
-	for _, data := range *questHearSet {
-		if data.QuestNPCId == 55179 {
-			fmt.Println(".. player says " + data.Hears)
-			fmt.Println(".. NPC says " + data.Says)
-		}
-	}
+	fmt.Println("* [Quest] Loaded", len(questNPCset), "quest NPCs.")
+	fmt.Println("* [Quest] Loaded", len(questHearSet), "quest hear/response statements.")
 
 	// set up the primary web handling function for web requests
 	http.HandleFunc("/", webContextHandler)
@@ -193,23 +180,54 @@ func loadDataSetsNPCs(c *eqdb.Connection) ([]eqobject.NPC, error) {
 	return npcSet, nil
 }
 
-func loadDataSetsAll(c *eqdb.Connection) ([]eqobject.Zone, []eqobject.NPC, []eqobject.DataSet, error) {
+func loadDataSetsQuestNPCs(c *eqdb.Connection, p string, z []eqobject.Zone, n []eqobject.NPC) (*[]eqquests.QuestNPC, error) {
+	//fmt.Fprintf(os.Stdout, "p = %v, %v, %v", p, &z, &n)
+	qnpcset, err := eqquests.LoadDataQuestNPCs(p, &z, &n)
+	if err != nil {
+		return nil, err
+	}
+
+	return qnpcset, nil
+}
+
+func loadDataSetsQuestHears(c *eqdb.Connection, q []eqquests.QuestNPC) (*[]eqquests.QuestHear, error) {
+	qhearset, err := eqquests.LoadDataQuestHears(&q)
+	if err != nil {
+		return nil, err
+	}
+
+	return qhearset, nil
+}
+
+func loadDataSetsAll(c *eqdb.Connection, e config.ServerConfig) ([]eqobject.Zone, []eqobject.NPC, []eqquests.QuestNPC, []eqquests.QuestHear, []eqobject.DataSet, error) {
 
 	dataSets := make([]eqobject.DataSet, 0)
 
 	zone, err := loadDataSetsZones(c)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 	dataSets = append(dataSets, eqobject.DataSet{Name: "Zones", Count: uint32(len(zone)), LoadTime: time.Now().String()})
 
 	npcs, err := loadDataSetsNPCs(c)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 	dataSets = append(dataSets, eqobject.DataSet{Name: "NPCs", Count: uint32(len(npcs)), LoadTime: time.Now().String()})
 
-	return zone, npcs, dataSets, nil
+	qnpc, err := loadDataSetsQuestNPCs(c, e.QuestDir, zone, npcs)
+	if err != nil {
+		return nil, nil, nil, nil, nil, err
+	}
+	dataSets = append(dataSets, eqobject.DataSet{Name: "Quest NPCs", Count: uint32(len(*qnpc)), LoadTime: time.Now().String()})
+
+	qhear, err := loadDataSetsQuestHears(c, *qnpc)
+	if err != nil {
+		return nil, nil, nil, nil, nil, err
+	}
+	dataSets = append(dataSets, eqobject.DataSet{Name: "Quest Hear/Responses", Count: uint32(len(*qhear)), LoadTime: time.Now().String()})
+
+	return zone, npcs, *qnpc, *qhear, dataSets, nil
 }
 
 func printStatus(c *config.ServerConfig) {
@@ -228,41 +246,66 @@ func printStatus(c *config.ServerConfig) {
 }
 
 func webContextHandler(w http.ResponseWriter, req *http.Request) {
+	// setup logging vars to log each web request
+	var logBuf bytes.Buffer
+	logWeb := log.New(&logBuf, "web: ", log.Lshortfile)
+	logFile, err := os.OpenFile("./logs/web.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println("! Cannot open web log for writing:", err)
+	}
+	defer logFile.Close()
+	logWeb.SetOutput(logFile)
 
-	log.Println("request received from", req.RemoteAddr+":", req.RequestURI)
+	tmplIntermediate, err := template.ParseFiles("./static/html/templates/index.html")
+	if err != nil {
+		fmt.Println("! Web processing error:", err)
+	}
+	var buf bytes.Buffer
+
+	logWeb.Println("request received from", req.RemoteAddr+":", req.RequestURI)
 
 	switch req.RequestURI {
 	case "/", "/index.html":
-		tmpl, err := template.ParseFiles("./static/html/templates/index.html")
-		if err != nil {
-			fmt.Println("! Web processing error:", err)
-		}
+		tmplIntermediate.Execute(&buf, webtemplates.Home)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, dataSets)
 	case "/zones.html":
-		tmpl, err := template.ParseFiles("./static/html/templates/zones.html")
-		if err != nil {
-			fmt.Println("! Web processing error:", err)
-		}
+		tmplIntermediate.Execute(&buf, webtemplates.Zones)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, zoneSet)
-	case "/npcs.html":
-		tmpl, err := template.ParseFiles("./static/html/templates/npcs.html")
-		if err != nil {
-			fmt.Println("! Web processing error:", err)
-		}
-		tmpl.Execute(w, npcSet)
 	case "/questnpcs.html":
-		tmpl, err := template.ParseFiles("./static/html/templates/questnpcs.html")
-		if err != nil {
-			fmt.Println("! Web processing error:", err)
-		}
+		tmplIntermediate.Execute(&buf, webtemplates.QuestNPCs)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, questNPCset)
 	case "/?reload-data-sets":
-		zoneSet, npcSet, dataSets, _ = loadDataSetsAll(eqDBConnection)
-
-		fmt.Println("*[DB] Loaded", len(zoneSet), "zones.")
-		fmt.Println("*[DB] Loaded", len(npcSet), "NPCs.")
-		http.Redirect(w, req, "/", http.StatusMovedPermanently)
+		zoneSet, npcSet, questNPCset, questHearSet, dataSets, err = loadDataSetsAll(eqDBConnection, *dashEQConfig)
+		if err != nil {
+			logWeb.Println("error reloading datasets!!", err)
+			http.Redirect(w, req, "/", http.StatusMovedPermanently)
+		} else {
+			fmt.Println("* [DB] Loaded", len(zoneSet), "zones.")
+			fmt.Println("* [DB] Loaded", len(npcSet), "NPCs.")
+			http.Redirect(w, req, "/", http.StatusMovedPermanently)
+		}
 	default:
-		http.ServeFile(w, req, "./static/html"+req.URL.Path)
+		query, _ := url.ParseQuery(req.URL.Opaque)
+		if strings.Contains(req.RequestURI, "questnpcid=") {
+			idUint64, _ := strconv.ParseUint(query.Get("questnpcid"), 10, 64)
+			idUint32 := uint32(idUint64)
+			fmt.Println(req.RequestURI)
+			fmt.Println(query.Get("questnpcid"))
+			fmt.Println(idUint64)
+			fmt.Println(idUint32)
+
+			var qNpcHearSubset []eqquests.QuestHear
+			tmplIntermediate.Execute(&buf, webtemplates.QuestNPCdetail)
+			for _, data := range questHearSet {
+				if data.QuestNPCId == idUint32 {
+					qNpcHearSubset = append(qNpcHearSubset, data)
+				}
+			}
+			tmpl := template.Must(template.New("").Parse(buf.String()))
+			tmpl.Execute(w, qNpcHearSubset)
+		}
 	}
 }

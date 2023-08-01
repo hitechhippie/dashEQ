@@ -13,7 +13,7 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/zones.html">Zones</a></li>
                 <li><a href="/items.html">Items</a></li>
-                <li><a href="/npcs.html">NPCs</a></li>
+                <li><a href="/questnpcs.html">Quest NPCs</a></li>
             </ul>
         </div>
     </div>
@@ -25,22 +25,8 @@
         <div class="table-container">
             <table class="data-table">
                 <thead>
-                    <tr>
-                        <th>dashEQ Data Sets</th>
-                    </tr>
-                    <tr>
-                        <th>DataSet</th>
-                        <th>Qty</th>
-                        <th>LoadTime</th>
-                    </tr>
-                </thead>
-                <tbody>{{range .}}
-                    <tr>
-                        <td>{{ .Name }}</td>
-                        <td>{{ .Count }}</td>
-                        <td>{{ .LoadTime }}</td>
-                    </tr>
-                {{end}}</tbody>
+{{.}}
+                </tbody>
             </table>
         </div>
     </div>
