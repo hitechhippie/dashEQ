@@ -9,10 +9,11 @@ import (
 )
 
 type QuestHear struct {
-	QuestNPCId uint32
-	Hears      string
-	GiveItems  []uint32
-	Says       string
+	QuestNPCId   uint32
+	QuestNPCName string
+	Hears        string
+	GiveItems    []uint32
+	Says         string
 }
 
 func LoadDataQuestHears(q *[]QuestNPC) (*[]QuestHear, error) {
@@ -39,6 +40,7 @@ func LoadDataQuestHears(q *[]QuestNPC) (*[]QuestHear, error) {
 					questHear = new(QuestHear)
 				}
 				questHear.QuestNPCId = q.Id
+				questHear.QuestNPCName = q.Name
 				questHear.Hears = regExHearPre.ReplaceAllString(currentLine, "")
 				questHear.Hears = regExPost.ReplaceAllString(questHear.Hears, "")
 			} else if strings.Contains(currentLine, "e.self:Say") {
