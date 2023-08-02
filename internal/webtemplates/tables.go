@@ -1,4 +1,4 @@
-package templates
+package webtemplates
 
 const (
 	Home = `                    <tr>

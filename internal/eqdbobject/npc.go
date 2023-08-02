@@ -1,4 +1,4 @@
-package eqobjects
+package eqdbobject
 
 type NPC struct {
 	Id          uint32

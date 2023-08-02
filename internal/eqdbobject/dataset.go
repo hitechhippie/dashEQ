@@ -1,4 +1,4 @@
-package eqobjects
+package eqdbobject
 
 type DataSet struct {
 	Name     string

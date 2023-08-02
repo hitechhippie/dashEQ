@@ -1,4 +1,4 @@
-package eqobjects
+package eqdbobject
 
 type Zone struct {
 	Id         uint32

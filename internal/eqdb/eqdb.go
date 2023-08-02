@@ -1,6 +1,7 @@
-package db
+package eqdb
 
 import (
+	"dasheq/internal/config"
 	"database/sql"
 
 	"github.com/go-sql-driver/mysql"
@@ -18,14 +19,14 @@ type Connection struct {
 	Target *sql.DB
 }
 
-func Connect(c *ConnectionConfig) (*Connection, error) {
+func Connect(c *config.ServerConfig) (*Connection, error) {
 	// Build the MySQL connection configuration
 	cfg := mysql.Config{
-		User:                 c.User,
-		Passwd:               c.Pass,
-		Net:                  c.Net,
-		Addr:                 c.Addr,
-		DBName:               c.Dbname,
+		User:                 c.DBuser,
+		Passwd:               c.DBpass,
+		Net:                  c.DBnet,
+		Addr:                 c.DBaddr,
+		DBName:               c.DBname,
 		AllowNativePasswords: true,
 	}
 
@@ -51,7 +52,11 @@ func Connect(c *ConnectionConfig) (*Connection, error) {
 	return &database, nil
 }
 
-func Close(d *Connection) error {
-	err := d.Target.Close()
-	return err
+func Close(c *Connection) error {
+	err := c.Target.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
