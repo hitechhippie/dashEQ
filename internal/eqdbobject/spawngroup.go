@@ -1,4 +1,4 @@
-package eqobjects
+package eqdbobject
 
 type Spawngroup struct {
 	Id            uint32

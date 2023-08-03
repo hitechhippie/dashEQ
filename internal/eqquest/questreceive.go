@@ -1,4 +1,4 @@
-package eqquests
+package eqquest
 
 type QuestReceive struct {
 	QuestNPCId uint32

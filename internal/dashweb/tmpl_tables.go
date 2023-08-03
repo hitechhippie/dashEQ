@@ -1,4 +1,4 @@
-package templates
+package dashweb
 
 const (
 	Home = `                    <tr>
