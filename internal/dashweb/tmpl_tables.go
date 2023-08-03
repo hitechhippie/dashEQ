@@ -1,4 +1,4 @@
-package webtemplates
+package dashweb
 
 const (
 	Home = `                    <tr>

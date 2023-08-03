@@ -58,6 +58,7 @@ func LoadDataQuestHear(q *[]QuestNPC) (*[]QuestHear, error) {
 	regExSayPre := regexp.MustCompile(`.*Say\(\"`)
 	regExEmotePre := regexp.MustCompile(`.*Emote\(\"`)
 	regExPost := regexp.MustCompile(`\"\).*`)
+	regExPlayerName := regexp.MustCompile(`e\.other:GetCleanName\(\)`)
 
 	for _, q := range *q {
 		data, err := os.ReadFile(q.File)
@@ -81,6 +82,7 @@ func LoadDataQuestHear(q *[]QuestNPC) (*[]QuestHear, error) {
 				questHear.Hears = regExPost.ReplaceAllString(questHear.Hears, "")
 			} else if strings.Contains(currentLine, "e.self:Say") {
 				questHear.Says = regExSayPre.ReplaceAllString(currentLine, "")
+				questHear.Says = regExPlayerName.ReplaceAllString(questHear.Says, "(player)")
 				questHear.Says = regExPost.ReplaceAllString(questHear.Says, "")
 			} else if strings.Contains(currentLine, "e.self.Emote") {
 				questHear.Says = regExEmotePre.ReplaceAllString(currentLine, "")
