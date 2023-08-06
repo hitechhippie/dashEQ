@@ -20,6 +20,7 @@ type Server struct {
 	DataSet   *[]eqdbobject.DataSet
 	Zone      *[]eqdbobject.Zone
 	NPC       *[]eqdbobject.NPC
+	Item      *[]eqdbobject.Item
 	QuestNPC  *[]eqquest.QuestNPC
 	QuestHear *[]eqquest.QuestHear
 }
@@ -73,17 +74,14 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 		tmplIntermediate.Execute(&buf, Zones)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.Zone)
+	case "/items.html":
+		tmplIntermediate.Execute(&buf, Items)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
+		tmpl.Execute(w, srv.Item)
 	case "/questnpcs.html":
 		tmplIntermediate.Execute(&buf, QuestNPCs)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.QuestNPC)
-	/*case "/?reload-data-sets":
-	err = loadDataSets(eqdbConnection, dashEQconfig)
-	if err != nil {
-		logWeb.Println("error reloading datasets!!", err)
-		http.Redirect(w, req, "/", http.StatusMovedPermanently)
-	}
-	http.Redirect(w, req, "/", http.StatusMovedPermanently)*/
 	default:
 		if strings.Contains(req.RequestURI, "questnpcid=") {
 			query := req.URL.Query().Get("questnpcid")
@@ -99,6 +97,20 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 			tmplIntermediate.Execute(&buf, QuestNPCdetail)
 			tmpl := template.Must(template.New("").Parse(buf.String()))
 			tmpl.Execute(w, qNpcHearSubset)
+		} else if strings.Contains(req.RequestURI, "itemid=") {
+			query := req.URL.Query().Get("itemid")
+			idUint64, _ := strconv.ParseUint(query, 10, 64)
+			idUint32 := uint32(idUint64)
+
+			var qItem eqdbobject.Item
+			for _, data := range *srv.Item {
+				if data.Id == idUint32 {
+					qItem = data
+				}
+			}
+			tmplIntermediate.Execute(&buf, ItemDetail)
+			tmpl := template.Must(template.New("").Parse(buf.String()))
+			tmpl.Execute(w, qItem)
 		} else {
 			http.ServeFile(w, req, "./static/html"+req.URL.Path)
 		}

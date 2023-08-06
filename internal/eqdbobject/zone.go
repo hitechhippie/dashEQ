@@ -4,7 +4,7 @@ type Zone struct {
 	Id         uint32
 	Short_name string
 	Long_name  string
-	Outdoor    uint8
+	Outdoor    bool
 	Expansion  uint8
 }
 

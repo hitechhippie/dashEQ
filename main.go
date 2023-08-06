@@ -17,6 +17,7 @@ var dashEQconfig *config.ServerConfig
 var dataSets *[]eqdbobject.DataSet
 var zoneSet *[]eqdbobject.Zone
 var npcSet *[]eqdbobject.NPC
+var itemSet *[]eqdbobject.Item
 var questNPCset *[]eqquest.QuestNPC
 var questHearSet *[]eqquest.QuestHear
 
@@ -58,6 +59,7 @@ func main() {
 	srv.DataSet = dataSets
 	srv.Zone = zoneSet
 	srv.NPC = npcSet
+	srv.Item = itemSet
 	srv.QuestNPC = questNPCset
 	srv.QuestHear = questHearSet
 
@@ -85,6 +87,12 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	}
 	dataSets = append(dataSets, eqdbobject.DataSet{Name: "NPCs", Count: uint32(len(*npcSet)), LoadTime: time.Now().String()})
 
+	itemSet, err = eqdbobject.LoadDataItem(c)
+	if err != nil {
+		return nil, err
+	}
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Items", Count: uint32(len(*itemSet)), LoadTime: time.Now().String()})
+
 	questNPCset, err = eqquest.LoadDataQuestNPC(e.QuestDir, zoneSet, npcSet)
 	if err != nil {
 		return nil, err
@@ -97,8 +105,13 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	}
 	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Quest Hear/Responses", Count: uint32(len(*questHearSet)), LoadTime: time.Now().String()})
 
+	questHearSet, err = eqquest.LoadDataQuestHear(questNPCset)
+	if err != nil {
+		return nil, err
+	}
 	fmt.Println("* [DB] Loaded", len(*zoneSet), "zones.")
 	fmt.Println("* [DB] Loaded", len(*npcSet), "NPCs.")
+	fmt.Println("* [DB] Loaded", len(*itemSet), "items.")
 	fmt.Println("* [Quest] Loaded", len(*questNPCset), "quest NPCs.")
 	fmt.Println("* [Quest] Loaded", len(*questHearSet), "quest hear/response statements.")
 
