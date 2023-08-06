@@ -1,6 +1,9 @@
 package eqdbobject
 
-import "dasheq/internal/eqdb"
+import (
+	"dasheq/internal/eqdb"
+	"dasheq/internal/logging"
+)
 
 func LoadDataZone(c *eqdb.Connection) (*[]Zone, error) {
 	// initialize our return objects
@@ -11,7 +14,7 @@ func LoadDataZone(c *eqdb.Connection) (*[]Zone, error) {
 		"id," + //Id uint16
 		"short_name," + //Short_name string
 		"long_name," + //Long_name  string
-		"castoutdoor," + //Outdoor    uint8
+		"castoutdoor," + //Outdoor  bool
 		"expansion " + //Expansion  uint8
 		"FROM zone")
 	if err != nil {
@@ -66,4 +69,66 @@ func LoadDataNPC(c *eqdb.Connection) (*[]NPC, error) {
 		npcSet = append(npcSet, *npc)
 	}
 	return &npcSet, nil
+}
+
+func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
+	logOb := logging.InitLogger("eqobject-item")
+
+	// initialize our return objects
+	itemSet := make([]Item, 0)
+
+	// gather the raw query data for zones
+	itemRows, err := c.Target.Query("SELECT " +
+		"id," + //uint16
+		"Name," + //string
+		"ac," + //int
+		"hp," + //int
+		"icon," + //uint32
+		"itemtype," + //uint32
+		"magic," + //bool
+		"mana," + //int
+		"nodrop," + //int
+		"norent," + //int
+		"classes," + //uint32
+		"races, " + //uint32
+		"reclevel, " + //uint8
+		"reqlevel, " + //uint8
+		"size, " + //uint8
+		"slots, " + //uint32
+		"weight " + //uint16
+		"FROM items")
+	if err != nil {
+		return nil, err
+	}
+
+	// iterate through the raw zone query data and populate the return object
+	for itemRows.Next() {
+		item := new(Item)
+		err = itemRows.Scan(
+			&item.Id,
+			&item.Name,
+			&item.AC,
+			&item.HP,
+			&item.Icon,
+			&item.Itemtype,
+			&item.Magic,
+			&item.Mana,
+			&item.DBnodrop,
+			&item.DBnorent,
+			&item.Classes,
+			&item.Races,
+			&item.Reclevel,
+			&item.Reqlevel,
+			&item.Size,
+			&item.Slots,
+			&item.Weight)
+		if err != nil {
+			logOb.Println(err)
+		}
+		item.Nodrop = item.DBnodrop.Bool()
+		item.Norent = item.DBnorent.Bool()
+		itemSet = append(itemSet, *item)
+	}
+
+	return &itemSet, nil
 }

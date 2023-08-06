@@ -146,3 +146,52 @@ p {
 .bottombar-list a:hover {
     text-decoration: underline;
 }
+
+.item-window {
+    max-width: 400px;
+    margin: 50px auto;
+    background: #fff;
+    border: 2px solid #007bff; /* Light blue border for the item window */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle elevation effect */
+    padding: 20px;
+}
+
+.item-icon {
+    text-align: left;
+}
+
+.item-icon img {
+    max-width: 100px;
+}
+
+.item-name {
+    text-align: center;
+    color: #007bff; /* Light blue for the item name */
+}
+
+.item-level, .item-type {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.item-description {
+    text-align: justify;
+}
+
+.item-stats {
+    margin-top: 20px;
+}
+
+.item-stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-value {
+    color: #007bff; /* Light blue for the item stat values */
+}
