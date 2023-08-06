@@ -1,5 +1,22 @@
 # dashEQ
 
+## Building
+`cd <main-dasheq-folder>`
+  * The main dashEQ folder is the top level module folder where this README resides.
+
+`go build cmd/dasheq/dasheq.go`
+
+## Configuring
+`cp config.yaml.example config.yaml`
+
+  * Now modify `config.yaml` to point at your desired eqemu-based mysql database.
+
+*Optional* Extract/copy an entire `quests` folder subdirectory from your eqemu server into the `static/quests` folder of this project.
+
+## Running
+* Linux: `./dasheq`
+* Windows: `dasheq.exe`
+
 ## Workflows (WIP)
 * Loot per zone SQL JOIN query; should do this in memory with structs:
 ```

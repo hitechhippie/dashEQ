@@ -6,7 +6,8 @@
 # Binaries for programs and plugins
 *.exe
 *.exe~
-dasheq
+/dasheq
+!cmd/dasheq/dasheq.go
 *.dll
 *.so
 *.dylib
