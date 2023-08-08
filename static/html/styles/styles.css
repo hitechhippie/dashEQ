@@ -147,31 +147,25 @@ p {
     text-decoration: underline;
 }
 
-.item-window {
-    max-width: 400px;
+.item-detail-table {
+    max-width: 700px;
+    border: 0;
+    border-spacing: 5px;
     margin: 50px auto;
-    background: #fff;
-    border: 2px solid #007bff; /* Light blue border for the item window */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle elevation effect */
-    padding: 20px;
 }
 
-.item-icon {
+.item-detail-icon {
+    max-width: 75px;
+    max-height: 75px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.item-detail-title {
     text-align: left;
-}
-
-.item-icon img {
-    max-width: 100px;
-}
-
-.item-name {
-    text-align: center;
+    font-size: x-large;
     color: #007bff; /* Light blue for the item name */
-}
-
-.item-level, .item-type {
-    text-align: center;
-    margin: 10px 0;
 }
 
 .item-description {
@@ -192,6 +186,16 @@ p {
     font-weight: bold;
 }
 
+.stat-label-inner {
+    font-weight: bold;
+    text-align: right;
+}
+
 .stat-value {
     color: #007bff; /* Light blue for the item stat values */
+}
+
+.stat-value-inner {
+    color: #007bff; /* Light blue for the item stat values */
+    text-align: right;
 }
