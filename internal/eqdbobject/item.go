@@ -1,5 +1,7 @@
 package eqdbobject
 
+import "fmt"
+
 type Item struct {
 	Id       uint32
 	Name     string
@@ -11,18 +13,21 @@ type Item struct {
 	Reqlevel uint8
 	Size     ItemSize
 	Slots    ItemSlots
-	Weight   uint16
+	Weight   EQweight
 	Magic    bool
 	Mana     int
 	DBnodrop EQEmuWeirdBool
 	DBnorent EQEmuWeirdBool
 	Classes  ClassList
+	Damage   uint16
+	Delay    uint16
 	Races    RaceList
 	Nodrop   bool
 	Norent   bool
 }
 
 type EQEmuWeirdBool int
+type EQweight float32
 
 func (b EQEmuWeirdBool) Bool() bool {
 	switch b {
@@ -31,6 +36,10 @@ func (b EQEmuWeirdBool) Bool() bool {
 	default:
 		return false
 	}
+}
+
+func (w EQweight) String() string {
+	return fmt.Sprintf("%.1f", (w / 10))
 }
 
 /*

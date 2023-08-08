@@ -90,12 +90,14 @@ func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 		"nodrop," + //int
 		"norent," + //int
 		"classes," + //uint32
+		"damage," + //uint16
+		"delay," + //uint16
 		"races, " + //uint32
 		"reclevel, " + //uint8
 		"reqlevel, " + //uint8
 		"size, " + //uint8
 		"slots, " + //uint32
-		"weight " + //uint16
+		"weight " + //float32
 		"FROM items")
 	if err != nil {
 		return nil, err
@@ -116,6 +118,8 @@ func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 			&item.DBnodrop,
 			&item.DBnorent,
 			&item.Classes,
+			&item.Damage,
+			&item.Delay,
 			&item.Races,
 			&item.Reclevel,
 			&item.Reqlevel,
