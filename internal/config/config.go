@@ -16,6 +16,7 @@ type ServerConfig struct {
 	WebAddr  string `yaml:"WebAddr"`
 	WebPort  string `yaml:"WebPort"`
 	QuestDir string `yaml:"QuestDir"`
+	EQemuEra string `yaml:"EQemuEra"`
 }
 
 func LoadConfigFromYAML(f string) (*ServerConfig, error) {

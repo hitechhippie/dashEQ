@@ -3,27 +3,28 @@ package eqdbobject
 import "fmt"
 
 type Item struct {
-	Id       uint32
-	Name     string
-	AC       int
-	HP       int
-	Icon     uint32
-	Itemtype ItemTypes
-	Reclevel uint8
-	Reqlevel uint8
-	Size     ItemSize
-	Slots    ItemSlots
-	Weight   EQweight
-	Magic    bool
-	Mana     int
-	DBnodrop EQEmuWeirdBool
-	DBnorent EQEmuWeirdBool
-	Classes  ClassList
-	Damage   uint16
-	Delay    uint16
-	Races    RaceList
-	Nodrop   bool
-	Norent   bool
+	Id           uint32
+	Name         string
+	AC           int
+	HP           int
+	Icon         uint32
+	Itemtype     ItemTypes
+	Reclevel     uint8
+	Reqlevel     uint8
+	ScrollEffect uint32
+	Size         ItemSize
+	Slots        ItemSlots
+	Weight       EQweight
+	Magic        bool
+	Mana         int
+	DBnodrop     EQEmuWeirdBool
+	DBnorent     EQEmuWeirdBool
+	Classes      ClassList
+	Damage       uint16
+	Delay        uint16
+	Races        RaceList
+	Nodrop       bool
+	Norent       bool
 }
 
 type EQEmuWeirdBool int

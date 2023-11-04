@@ -8,6 +8,7 @@ import (
 	"dasheq/internal/eqquest"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -17,6 +18,8 @@ var dashEQconfig *config.ServerConfig
 var dataSets *[]eqdbobject.DataSet
 var zoneSet *[]eqdbobject.Zone
 var npcSet *[]eqdbobject.NPC
+var spellSet *[]eqdbobject.Spell
+var skillSet *[]eqdbobject.Skill
 var itemSet *[]eqdbobject.Item
 var questNPCset *[]eqquest.QuestNPC
 var questHearSet *[]eqquest.QuestHear
@@ -59,9 +62,12 @@ func main() {
 	srv.DataSet = dataSets
 	srv.Zone = zoneSet
 	srv.NPC = npcSet
+	srv.Spell = spellSet
 	srv.Item = itemSet
 	srv.QuestNPC = questNPCset
 	srv.QuestHear = questHearSet
+
+	printStatus(srv.Config)
 
 	err = dashweb.Run(srv)
 	if err != nil {
@@ -87,6 +93,18 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	}
 	dataSets = append(dataSets, eqdbobject.DataSet{Name: "NPCs", Count: uint32(len(*npcSet)), LoadTime: time.Now().String()})
 
+	spellSet, err = eqdbobject.LoadDataSpell(c, e)
+	if err != nil {
+		return nil, err
+	}
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Spells", Count: uint32(len(*spellSet)), LoadTime: time.Now().String()})
+
+	skillSet, err = eqdbobject.LoadDataSkill(c, e)
+	if err != nil {
+		return nil, err
+	}
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Skills", Count: uint32(len(*spellSet)), LoadTime: time.Now().String()})
+
 	itemSet, err = eqdbobject.LoadDataItem(c)
 	if err != nil {
 		return nil, err
@@ -111,9 +129,23 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	}
 	fmt.Println("* [DB] Loaded", len(*zoneSet), "zones.")
 	fmt.Println("* [DB] Loaded", len(*npcSet), "NPCs.")
+	fmt.Println("* [DB] Loaded", len(*spellSet), "spells.")
+	fmt.Println("* [DB] Loaded", len(*skillSet), "skill entries.")
 	fmt.Println("* [DB] Loaded", len(*itemSet), "items.")
 	fmt.Println("* [Quest] Loaded", len(*questNPCset), "quest NPCs.")
 	fmt.Println("* [Quest] Loaded", len(*questHearSet), "quest hear/response statements.")
 
 	return &dataSets, nil
+}
+
+func printStatus(c *config.ServerConfig) {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+
+	fmt.Println()
+	fmt.Println("// system memory allocated:", (m.Sys / 1000000), "MB")
+	fmt.Println("// system memory consumed:", (m.HeapAlloc / 1000000), "MB")
+	fmt.Println()
+	fmt.Println("*** DashEQ Listening for Requests on: " + c.WebAddr + ":" + c.WebPort + " ***")
+	fmt.Println()
 }

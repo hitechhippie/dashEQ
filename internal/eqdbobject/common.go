@@ -1,8 +1,10 @@
 package eqdbobject
 
 import (
+	"dasheq/internal/config"
 	"dasheq/internal/eqdb"
 	"dasheq/internal/logging"
+	"errors"
 )
 
 func LoadDataZone(c *eqdb.Connection) (*[]Zone, error) {
@@ -71,6 +73,108 @@ func LoadDataNPC(c *eqdb.Connection) (*[]NPC, error) {
 	return &npcSet, nil
 }
 
+func LoadDataSkill(c *eqdb.Connection, e *config.ServerConfig) (*[]Skill, error) {
+	// initialize our return objects
+	skillSet := make([]Skill, 0)
+
+	skillRows, err := c.Target.Query("SELECT " +
+		"skillID," + //Id uint32
+		"class," + //Name string
+		"level, " + //uint8
+		"cap " + //uint8
+		"FROM skill_caps")
+
+	if err != nil {
+		return nil, err
+	}
+
+	for skillRows.Next() {
+		skill := new(Skill)
+		skillRows.Scan(&skill.SkillID, &skill.Class, &skill.Level, &skill.Cap)
+		skillSet = append(skillSet, *skill)
+	}
+
+	return &skillSet, nil
+}
+
+func LoadDataSpell(c *eqdb.Connection, e *config.ServerConfig) (*[]Spell, error) {
+	// initialize our return objects
+	spellSet := make([]Spell, 0)
+
+	// gather the raw query data for npcs
+	// separate routines for mainline eqemu vs eqmacemu for berserker class
+	if e.EQemuEra == "eqmacemu" {
+		spellRows, err := c.Target.Query("SELECT " +
+			"id," + //Id uint32
+			"name," + //Name string
+			"classes1, " + //uint8
+			"classes2, " + //uint8
+			"classes3, " + //uint8
+			"classes4, " + //uint8
+			"classes5, " + //uint8
+			"classes6, " + //uint8
+			"classes7, " + //uint8
+			"classes8, " + //uint8
+			"classes9, " + //uint8
+			"classes10, " + //uint8
+			"classes11, " + //uint8
+			"classes12, " + //uint8
+			"classes13, " + //uint8
+			"classes14, " + //uint8
+			"classes15, " + //uint8
+			"new_icon " + //uint8
+			"FROM spells_new")
+
+		if err != nil {
+			return nil, err
+		}
+
+		for spellRows.Next() {
+			spell := new(Spell)
+			spellRows.Scan(&spell.Id, &spell.Name, &spell.Classes1, &spell.Classes2, &spell.Classes3, &spell.Classes4, &spell.Classes5, &spell.Classes6, &spell.Classes7, &spell.Classes8, &spell.Classes9, &spell.Classes10, &spell.Classes11, &spell.Classes12, &spell.Classes13, &spell.Classes14, &spell.Classes15, &spell.NewIcon)
+			spellSet = append(spellSet, *spell)
+		}
+
+	} else if e.EQemuEra == "eqemu" {
+		spellRows, err := c.Target.Query("SELECT " +
+			"id," + //Id uint32
+			"name," + //Name string
+			"classes1, " + //uint8
+			"classes2, " + //uint8
+			"classes3, " + //uint8
+			"classes4, " + //uint8
+			"classes5, " + //uint8
+			"classes6, " + //uint8
+			"classes7, " + //uint8
+			"classes8, " + //uint8
+			"classes9, " + //uint8
+			"classes10, " + //uint8
+			"classes11, " + //uint8
+			"classes12, " + //uint8
+			"classes13, " + //uint8
+			"classes14, " + //uint8
+			"classes15, " + //uint8
+			"classes16, " + //uint8
+			"new_icon " + //uint8
+			"FROM spells_new")
+
+		if err != nil {
+			return nil, err
+		}
+
+		for spellRows.Next() {
+			spell := new(Spell)
+			spellRows.Scan(&spell.Id, &spell.Name, &spell.Classes1, &spell.Classes2, &spell.Classes3, &spell.Classes4, &spell.Classes5, &spell.Classes6, &spell.Classes7, &spell.Classes8, &spell.Classes9, &spell.Classes10, &spell.Classes11, &spell.Classes12, &spell.Classes13, &spell.Classes14, &spell.Classes15, &spell.Classes16, &spell.NewIcon)
+			spellSet = append(spellSet, *spell)
+		}
+
+	} else {
+		return nil, errors.New("invalid EQemuEra configured")
+	}
+
+	return &spellSet, nil
+}
+
 func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 	logOb := logging.InitLogger("eqobject-item")
 
@@ -95,6 +199,7 @@ func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 		"races, " + //uint32
 		"reclevel, " + //uint8
 		"reqlevel, " + //uint8
+		"scrolleffect, " + //uint32
 		"size, " + //uint8
 		"slots, " + //uint32
 		"weight " + //float32
@@ -123,6 +228,7 @@ func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 			&item.Races,
 			&item.Reclevel,
 			&item.Reqlevel,
+			&item.ScrollEffect,
 			&item.Size,
 			&item.Slots,
 			&item.Weight)

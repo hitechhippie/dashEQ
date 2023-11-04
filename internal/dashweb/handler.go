@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"dasheq/internal/config"
 	"dasheq/internal/eqdbobject"
+	"dasheq/internal/eqdbtransformation"
 	"dasheq/internal/eqquest"
 	"dasheq/internal/logging"
 	"fmt"
 	"log"
 	"net/http"
-	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -20,6 +21,7 @@ type Server struct {
 	DataSet   *[]eqdbobject.DataSet
 	Zone      *[]eqdbobject.Zone
 	NPC       *[]eqdbobject.NPC
+	Spell     *[]eqdbobject.Spell
 	Item      *[]eqdbobject.Item
 	QuestNPC  *[]eqquest.QuestNPC
 	QuestHear *[]eqquest.QuestHear
@@ -44,7 +46,6 @@ func Run(s Server) error {
 		return err
 	}
 
-	printStatus(srv.Config)
 	return nil
 }
 
@@ -67,19 +68,27 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 
 	switch req.RequestURI {
 	case "/", "/index.html":
-		tmplIntermediate.Execute(&buf, Home)
+		tmplIntermediate.Execute(&buf, TmplHome)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
+		tmpl.Execute(w, nil)
+	case "/datasets.html":
+		tmplIntermediate.Execute(&buf, TmplDataSets)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.DataSet)
 	case "/zones.html":
-		tmplIntermediate.Execute(&buf, Zones)
+		tmplIntermediate.Execute(&buf, TmplZones)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.Zone)
+	case "/spells.html":
+		tmplIntermediate.Execute(&buf, TmplSpells)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
+		tmpl.Execute(w, srv.Spell)
 	case "/items.html":
-		tmplIntermediate.Execute(&buf, Items)
+		tmplIntermediate.Execute(&buf, TmplItems)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.Item)
 	case "/questnpcs.html":
-		tmplIntermediate.Execute(&buf, QuestNPCs)
+		tmplIntermediate.Execute(&buf, TmplQuestNPCs)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.QuestNPC)
 	default:
@@ -94,9 +103,10 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 					qNpcHearSubset = append(qNpcHearSubset, data)
 				}
 			}
-			tmplIntermediate.Execute(&buf, QuestNPCdetail)
+			tmplIntermediate.Execute(&buf, TmplQuestNPCdetail)
 			tmpl := template.Must(template.New("").Parse(buf.String()))
 			tmpl.Execute(w, qNpcHearSubset)
+
 		} else if strings.Contains(req.RequestURI, "itemid=") {
 			query := req.URL.Query().Get("itemid")
 			idUint64, _ := strconv.ParseUint(query, 10, 64)
@@ -108,23 +118,26 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 					qItem = data
 				}
 			}
-			tmplIntermediate.Execute(&buf, ItemDetail)
+			tmplIntermediate.Execute(&buf, TmplItemDetail)
 			tmpl := template.Must(template.New("").Parse(buf.String()))
 			tmpl.Execute(w, qItem)
+
+		} else if strings.Contains(req.RequestURI, "spellsbyclassid=") {
+			query := req.URL.Query().Get("spellsbyclassid")
+			idUint8, _ := strconv.ParseUint(query, 10, 8)
+
+			var qSpellByClass []eqdbtransformation.SpellByClass
+			eqdbtransformation.PopulateSpellByClass(&qSpellByClass, int(idUint8), srv.Spell, srv.Item)
+
+			// Sort by level
+			sort.Sort(eqdbtransformation.SpellByClassList(qSpellByClass))
+
+			tmplIntermediate.Execute(&buf, TmplSpellsByClass)
+			tmpl := template.Must(template.New("").Parse(buf.String()))
+			tmpl.Execute(w, qSpellByClass)
+
 		} else {
 			http.ServeFile(w, req, "./static/html"+req.URL.Path)
 		}
 	}
-}
-
-func printStatus(c *config.ServerConfig) {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-
-	fmt.Println()
-	fmt.Println("// system memory allocated:", (m.Sys / 1000000), "MB")
-	fmt.Println("// system memory consumed:", (m.HeapAlloc / 1000000), "MB")
-	fmt.Println()
-	fmt.Println("*** DashEQ Listening for Requests on: " + c.WebAddr + ":" + c.WebPort + " ***")
-	fmt.Println()
 }

@@ -1,7 +1,7 @@
 package dashweb
 
 const (
-	Items = `
+	TmplItems = `
 		<table class="data-table">
 			<thead>
 				<tr>
@@ -35,12 +35,16 @@ const (
 )
 
 const (
-	ItemDetail = `
+	TmplItemDetail = `
 		<table class="item-detail-table">
 			<tbody>
 				<tr>
 					<td class="item-detail-title"><img class="item-detail-icon" src="images/dasheq-default.png" alt="Item Icon"></td>
 					<td class="item-detail-title">{{ .Name }}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="item-detail-title" style="float:right"><img src="icons/item_{{ .Icon }}.gif"</td>
 				</tr>
 				<tr>
 				{{ if .Nodrop }}
