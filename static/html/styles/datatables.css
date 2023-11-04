@@ -1,0 +1,89 @@
+.data-table {
+    width: 700px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 90px;
+    margin-bottom: 90px;
+    display: block;
+}
+
+.data-table tbody {
+    width: 100%;
+    overflow: auto;
+}
+
+.data-table th, .data-table td {
+    padding: 5px 10px;
+    text-align: left;
+    width: 200px;
+}
+
+.data-table td.integer th.integer {
+    text-align: center;
+}
+
+.data-table th {
+    background-color: #007bff; /* Light blue for the table header */
+    color: #fff; /* White text color for the table header */
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f0f7fc; /* Light blue shade for even rows */
+}
+
+.data-table tbody tr:hover {
+    background-color: #cce5ff; /* Lighter blue shade on hover */
+}
+
+.item-detail-table {
+    max-width: 700px;
+    border: 0;
+    border-spacing: 5px;
+    margin: 50px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle elevation effect */
+}
+
+.item-detail-icon {
+    max-width: 75px;
+    max-height: 75px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.item-detail-title {
+    text-align: left;
+    font-size: x-large;
+    color: #007bff; /* Light blue for the item name */
+}
+
+.item-description {
+    text-align: justify;
+}
+
+.item-stats {
+    margin-top: 20px;
+}
+
+.item-stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-label-inner {
+    font-weight: bold;
+    text-align: right;
+}
+
+.stat-value {
+    color: #007bff; /* Light blue for the item stat values */
+}
+
+.stat-value-inner {
+    color: #007bff; /* Light blue for the item stat values */
+    text-align: right;
+}
