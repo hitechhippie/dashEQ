@@ -5,30 +5,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DashEQ: Home</title>
+    <link rel="stylesheet" href="/styles/navbar.css">
     <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/datatables.css">
 </head>
 <body>
-    <div class="sidebar">
-        <div class="persistent-links">
-            <ul class="link-list">
-                <li><a href="/">Home</a></li>
-                <li><a href="/zones.html">Zones</a></li>
-                <li><a href="/items.html">Items</a></li>
-                <li><a href="/questnpcs.html">Quest NPCs</a></li>
-            </ul>
-        </div>
+    <div class="navbar-container">
+        <ul>
+            <li class="dropdown">
+                <a href="/spells.html" class="dropbtn">Spells</a>
+                <div class="dropdown-content">
+                    <a href="?spellsbyclassid=1">Warrior</a>
+                    <a href="/spells.html?spellsbyclassid=2">Cleric</a>
+                    <a href="/spells.html?spellsbyclassid=3">Paladin</a>
+                    <a href="/spells.html?spellsbyclassid=4">Ranger</a>
+                    <a href="/spells.html?spellsbyclassid=5">Shadow Knight</a>
+                    <a href="/spells.html?spellsbyclassid=6">Druid</a>
+                    <a href="/spells.html?spellsbyclassid=7">Monk</a>
+                    <a href="/spells.html?spellsbyclassid=8">Bard</a>
+                    <a href="/spells.html?spellsbyclassid=9">Rogue</a>
+                    <a href="/spells.html?spellsbyclassid=10">Shaman</a>
+                    <a href="/spells.html?spellsbyclassid=11">Necromancer</a>
+                    <a href="/spells.html?spellsbyclassid=12">Wizard</a>
+                    <a href="/spells.html?spellsbyclassid=13">Magician</a>
+                    <a href="/spells.html?spellsbyclassid=14">Enchanter</a>
+                    <a href="/spells.html?spellsbyclassid=15">Beastlord</a>
+                    <a href="/spells.html?spellsbyclassid=16">Berserker</a>
+                </div>
+            </li>
+            <li><a href="/skills.html">Skills</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Database</a>
+                <div class="dropdown-content">
+                    <a href="/datasets.html">Data Sets</a>
+                    <a href="/zones.html">Zones</a>
+                </div>
+            </li>
+            <li style="float:right"><a href="/index.html">dasheq 1.0</a></li>
+        </ul>
     </div>
-    <div class="main-content">
-        <div class="titlebar">
-            <h1 class="title">DashEQ: An EQEmu Database Dashboard</h1>
-            <p class="titlesub">A simple, fast EverQuest emulator database browser written in Go.</p>
-        </div>
-        <div class="table-container">
 {{.}}
-        </div>
-    </div>
     <div class="bottombar-container">
-        <p style="font-size: 15px; max-height: 20px">EverQuest is a registered trademark of Daybreak Game Company.</p>
+        EverQuest is a registered trademark of Daybreak Game Company.
     </div>
 </body>
 </html>
