@@ -62,6 +62,7 @@ func main() {
 	srv.DataSet = dataSets
 	srv.Zone = zoneSet
 	srv.NPC = npcSet
+	srv.Skill = skillSet
 	srv.Spell = spellSet
 	srv.Item = itemSet
 	srv.QuestNPC = questNPCset
@@ -103,7 +104,7 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	if err != nil {
 		return nil, err
 	}
-	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Skills", Count: uint32(len(*spellSet)), LoadTime: time.Now().String()})
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Skills", Count: uint32(len(*skillSet)), LoadTime: time.Now().String()})
 
 	itemSet, err = eqdbobject.LoadDataItem(c)
 	if err != nil {

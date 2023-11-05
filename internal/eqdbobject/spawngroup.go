@@ -1,20 +1,6 @@
 package eqdbobject
 
-type Spawngroup struct {
-	Id            uint32
-	Name          string
-	Spawn_limit   uint8
-	Dist          float32
-	Max_x         float32
-	Min_x         float32
-	Max_y         float32
-	Min_y         float32
-	Delay         uint32
-	Mindelay      uint32
-	Despawn       uint8
-	Despawn_timer uint32
-	Wp_spawns     uint8
-}
+// future spawngroup type implementations placeholder
 
 /*
 +---------------+---------------------+------+-----+---------+----------------+

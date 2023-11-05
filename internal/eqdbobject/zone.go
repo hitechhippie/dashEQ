@@ -1,12 +1,6 @@
 package eqdbobject
 
-type Zone struct {
-	Id         uint32
-	Short_name string
-	Long_name  string
-	Outdoor    bool
-	Expansion  uint8
-}
+// future zone type implementations placeholder
 
 /*
 +---------------------------+------------------------------+------+-----+---------+----------------+

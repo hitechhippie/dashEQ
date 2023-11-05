@@ -1,34 +1,9 @@
 package eqdbobject
 
-import "fmt"
-
-type Item struct {
-	Id           uint32
-	Name         string
-	AC           int
-	HP           int
-	Icon         uint32
-	Itemtype     ItemTypes
-	Reclevel     uint8
-	Reqlevel     uint8
-	ScrollEffect uint32
-	Size         ItemSize
-	Slots        ItemSlots
-	Weight       EQweight
-	Magic        bool
-	Mana         int
-	DBnodrop     EQEmuWeirdBool
-	DBnorent     EQEmuWeirdBool
-	Classes      ClassList
-	Damage       uint16
-	Delay        uint16
-	Races        RaceList
-	Nodrop       bool
-	Norent       bool
-}
-
-type EQEmuWeirdBool int
-type EQweight float32
+import (
+	"fmt"
+	"strings"
+)
 
 func (b EQEmuWeirdBool) Bool() bool {
 	switch b {
@@ -41,6 +16,290 @@ func (b EQEmuWeirdBool) Bool() bool {
 
 func (w EQweight) String() string {
 	return fmt.Sprintf("%.1f", (w / 10))
+}
+
+func (t ItemTypes) String() string {
+	switch t {
+	case 0:
+		return "1H Slashing"
+	case 1:
+		return "2H Slashing"
+	case 2:
+		return "1H Piercing"
+	case 3:
+		return "1H Blunt"
+	case 4:
+		return "2H Blunt"
+	case 5:
+		return "Archery"
+	case 7:
+		return "Throwing"
+	case 8:
+		return "Shield"
+	case 10:
+		return "Armor"
+	case 11:
+		return "Tradeskill Items"
+	case 12:
+		return "Lockpicking"
+	case 14:
+		return "Food"
+	case 15:
+		return "Drink"
+	case 16:
+		return "Light Source"
+	case 17:
+		return "Common Inventory Item"
+	case 18:
+		return "Bind Wound"
+	case 19:
+		return "Thrown Casting Items"
+	case 20:
+		return "Spells / Song Sheets"
+	case 21:
+		return "Potions"
+	case 22:
+		return "Fletched Arrows"
+	case 23:
+		return "Wind Instruments"
+	case 24:
+		return "Stringed Instruments"
+	case 25:
+		return "Brass Instruments"
+	case 26:
+		return "Percussion Instruments"
+	case 27:
+		return "Ammo"
+	case 29:
+		return "Jewelry"
+	case 31:
+		return "Readable Notes and Scrolls"
+	case 32:
+		return "Readable Books"
+	case 33:
+		return "Keys"
+	case 34:
+		return "Odd Items"
+	case 35:
+		return "2H Piercing"
+	case 36:
+		return "Fishing Poles"
+	case 37:
+		return "Fishing Bait"
+	case 38:
+		return "Alcoholic Beverages"
+	case 39:
+		return "More Keys"
+	case 40:
+		return "Compasses"
+	case 42:
+		return "Poisons"
+	case 45:
+		return "Hand to Hand"
+	case 52:
+		return "Charms"
+	case 53:
+		return "Dyes"
+	case 54:
+		return "Augments"
+	case 55:
+		return "Augment Solvents"
+	case 56:
+		return "Augment Distillers"
+	case 58:
+		return "Fellowship Banner Materials"
+	case 60:
+		return "Cultural Armor Manuals"
+	case 63:
+		return "New Curencies like Orum"
+	default:
+		return "Unknown"
+	}
+}
+
+func (s ItemSlotsBitmask) String() string {
+	if s == slotMax || s == 0 {
+		return "ALL"
+	}
+
+	switch s {
+	case Charm:
+		return "Charm"
+	case Ear_1:
+		return "Ear"
+	case Head:
+		return "Head"
+	case Face:
+		return "Face"
+	case Ear_2:
+		return "Ear"
+	case Neck:
+		return "Neck"
+	case Shoulder:
+		return "Shoulder"
+	case Arms:
+		return "Arms"
+	case Back:
+		return "Back"
+	case Bracer_1:
+		return "Bracer"
+	case Bracer_2:
+		return "Bracer"
+	case Range:
+		return "Range"
+	case Hands:
+		return "Hands"
+	case Primary:
+		return "Primary"
+	case Secondary:
+		return "Secondary"
+	case Ring_1:
+		return "Ring"
+	case Ring_2:
+		return "Ring"
+	case Chest:
+		return "Chest"
+	case Legs:
+		return "Legs"
+	case Feet:
+		return "Feet"
+	case Waist:
+		return "Waist"
+	case Powersource:
+		return "Powersource"
+	case Ammo:
+		return "Ammo"
+	}
+
+	// multiple races
+	var slots []string
+	for slot := Charm; slot < slotMax; slot <<= 1 {
+		if s&slot != 0 {
+			slots = append(slots, slot.String())
+		}
+	}
+	return strings.Join(slots, " | ")
+}
+
+func (r RaceListBitmask) String() string {
+
+	if r == raceMax || r == 0 {
+		return "ALL"
+	}
+
+	switch r {
+	case HUM:
+		return "HUM"
+	case BAR:
+		return "BAR"
+	case ERU:
+		return "ERU"
+	case ELF:
+		return "ELF"
+	case HIE:
+		return "HIE"
+	case DEF:
+		return "DEF"
+	case HEF:
+		return "HEF"
+	case DWF:
+		return "DWF"
+	case TRL:
+		return "TRL"
+	case OGR:
+		return "OGR"
+	case HFL:
+		return "HFL"
+	case GNM:
+		return "GNM"
+	case IKS:
+		return "IKS"
+	case VAH:
+		return "VAH"
+	case FRG:
+		return "FRG"
+	case DRA:
+		return "DRA"
+	}
+
+	// multiple races
+	var races []string
+	for race := HUM; race < raceMax; race <<= 1 {
+		if r&race != 0 {
+			races = append(races, race.String())
+		}
+	}
+	return strings.Join(races, " | ")
+}
+
+func (c ClassListBitmask) String() string {
+
+	if c == classMax || c == 0 {
+		return "ALL"
+	}
+
+	switch c {
+	case WAR:
+		return "WAR"
+	case CLR:
+		return "CLR"
+	case PAL:
+		return "PAL"
+	case RNG:
+		return "RNG"
+	case SHD:
+		return "SHD"
+	case DRU:
+		return "DRU"
+	case MNK:
+		return "MNK"
+	case BRD:
+		return "BRD"
+	case ROG:
+		return "ROG"
+	case SHM:
+		return "SHM"
+	case NEC:
+		return "NEC"
+	case WIZ:
+		return "WIZ"
+	case MAG:
+		return "MAG"
+	case ENC:
+		return "ENC"
+	case BST:
+		return "BST"
+	case BER:
+		return "BER"
+	}
+
+	// multiple races
+	var classes []string
+	for class := WAR; class < classMax; class <<= 1 {
+		if c&class != 0 {
+			classes = append(classes, class.String())
+		}
+	}
+	return strings.Join(classes, " | ")
+}
+
+func (s ItemSize) String() string {
+	switch s {
+	case 0:
+		return "TINY"
+	case 1:
+		return "SMALL"
+	case 2:
+		return "MEDIUM"
+	case 3:
+		return "LARGE"
+	case 4:
+		return "GIANT"
+	case 5:
+		return "GIGANTIC"
+	default:
+		return "UNKNOWN"
+	}
 }
 
 /*

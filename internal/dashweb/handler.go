@@ -22,6 +22,7 @@ type Server struct {
 	Zone      *[]eqdbobject.Zone
 	NPC       *[]eqdbobject.NPC
 	Spell     *[]eqdbobject.Spell
+	Skill     *[]eqdbobject.Skill
 	Item      *[]eqdbobject.Item
 	QuestNPC  *[]eqquest.QuestNPC
 	QuestHear *[]eqquest.QuestHear
@@ -83,6 +84,10 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 		tmplIntermediate.Execute(&buf, TmplSpells)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
 		tmpl.Execute(w, srv.Spell)
+	case "/skills.html":
+		tmplIntermediate.Execute(&buf, TmplSkills)
+		tmpl := template.Must(template.New("").Parse(buf.String()))
+		tmpl.Execute(w, srv.Skill)
 	case "/items.html":
 		tmplIntermediate.Execute(&buf, TmplItems)
 		tmpl := template.Must(template.New("").Parse(buf.String()))
@@ -135,6 +140,18 @@ func contextHandler(w http.ResponseWriter, req *http.Request) {
 			tmplIntermediate.Execute(&buf, TmplSpellsByClass)
 			tmpl := template.Must(template.New("").Parse(buf.String()))
 			tmpl.Execute(w, qSpellByClass)
+
+		} else if strings.Contains(req.RequestURI, "skillsbyclassid=") {
+			var qSkillsByClassID []eqdbobject.Skill
+
+			query := req.URL.Query().Get("skillsbyclassid")
+			qSkillQueryID, _ := strconv.ParseUint(query, 10, 8)
+
+			eqdbtransformation.SkillByClassSubset(srv.Skill, &qSkillsByClassID, uint8(qSkillQueryID))
+
+			tmplIntermediate.Execute(&buf, TmplSkills)
+			tmpl := template.Must(template.New("").Parse(buf.String()))
+			tmpl.Execute(w, qSkillsByClassID)
 
 		} else {
 			http.ServeFile(w, req, "./static/html"+req.URL.Path)

@@ -1,26 +1,6 @@
 package eqdbobject
 
-type Spell struct {
-	Id        uint32
-	Name      string
-	Classes1  uint8
-	Classes2  uint8
-	Classes3  uint8
-	Classes4  uint8
-	Classes5  uint8
-	Classes6  uint8
-	Classes7  uint8
-	Classes8  uint8
-	Classes9  uint8
-	Classes10 uint8
-	Classes11 uint8
-	Classes12 uint8
-	Classes13 uint8
-	Classes14 uint8
-	Classes15 uint8
-	Classes16 uint8
-	NewIcon   uint16
-}
+// future spell type implementations placeholder
 
 /*
 +--------------------------+--------------+------+-----+------------+-------+

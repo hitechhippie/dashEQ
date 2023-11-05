@@ -78,11 +78,11 @@ func LoadDataSkill(c *eqdb.Connection, e *config.ServerConfig) (*[]Skill, error)
 	skillSet := make([]Skill, 0)
 
 	skillRows, err := c.Target.Query("SELECT " +
-		"skillID," + //Id uint32
-		"class," + //Name string
+		"skillID," + //SkillID uint8 -> Skill(String)
+		"class," + //ClassID uint8 -> Class(String)
 		"level, " + //uint8
 		"cap " + //uint8
-		"FROM skill_caps")
+		"FROM skill_caps ORDER BY level")
 
 	if err != nil {
 		return nil, err
@@ -90,8 +90,9 @@ func LoadDataSkill(c *eqdb.Connection, e *config.ServerConfig) (*[]Skill, error)
 
 	for skillRows.Next() {
 		skill := new(Skill)
-		skillRows.Scan(&skill.SkillID, &skill.Class, &skill.Level, &skill.Cap)
+		skillRows.Scan(&skill.Skill, &skill.Class, &skill.Level, &skill.Cap)
 		skillSet = append(skillSet, *skill)
+		//println(skill.Level, skill.Class.String(), skill.Skill.String(), skill.Cap)
 	}
 
 	return &skillSet, nil
