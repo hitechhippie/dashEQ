@@ -9,35 +9,38 @@ const (
                     <th>Name</th>
                     <th>Zone</th>
                     <th>Quest File</th>
-                    <th>Quest Text</th>
+                    <th>Quest NPCs</th>
                 </tr>
             </thead>
                 <tbody>{{range .}}
                     <tr>
                         <td><a href=/?questnpcid={{ .Id }}>{{ .Id }}</a></td>
                         <td>{{ .Name }}</td>
-                        <td>{{ .Zone }}</td>
+                        <td>{{ .ZoneName }}</td>
                         <td>{{ .File }}</td>
                     </tr>{{end}}
                 </tbody>
         </table>
+        <script type="text/javascript" src="/includes/tableSortable.js"></script>
 `
 )
 
 const (
-	TmplQuestNPCdetail = `                <tr>
-                        <th>Quest NPC Detail</th>
-                    </tr>
-                    <tr>
-                        <th>Player Says</th>
-                        <th>NPC Responds</th>
-                    </tr>
-                </thead>
+	TmplQuestNPCdetail = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Quest NPC Detail</th>
+                </tr>
+            </thead>
                 <tbody>{{range .}}
                     <tr>
                         <td>{{ .QuestNPCName }} hears, "{{ .Hears }}"</td>
                         <td>{{ .QuestNPCName }} responds, "{{ .Says }}"</td>
                     </tr>{{end}}
-                    <tr>
-                        <td><a href="javascript:history.back()">< back ></a></td>`
+                </tbody>
+        </table>
+        <a href="javascript:history.back()">< back ></a>
+        <script type="text/javascript" src="/includes/tableSortable.js"></script>
+    `
 )

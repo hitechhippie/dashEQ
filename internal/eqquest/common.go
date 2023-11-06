@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -24,7 +25,7 @@ func LoadDataQuestNPC(d string, zoneSet *[]eqdbobject.Zone, npcSet *[]eqdbobject
 	curDir = filepath.Base(d)
 
 	// log each data load run
-	logQuest = logging.InitLogger("loaddataquestnpc")
+	logQuest = logging.InitLogger("loaddataquestnpc", true)
 
 	err = filepath.WalkDir(d, func(path string, de fs.DirEntry, err error) error {
 		if err != nil {
@@ -122,6 +123,12 @@ func processQuestFile(f string, d string, questNPCset []QuestNPC, zoneSet *[]eqd
 			return questNPCset, nil
 		}
 
+		qnpc.ZoneName, err = zoneNameLookup(qnpc.Zone, zoneSet)
+		if err != nil {
+			l.Println(err)
+			return questNPCset, nil
+		}
+
 		questNPCset = append(questNPCset, *qnpc)
 		return questNPCset, nil
 	}
@@ -150,4 +157,14 @@ func zoneIdLookup(s string, z *[]eqdbobject.Zone) (uint32, error) {
 	}
 	err := errors.New("Zone ID not found in Zone data set: " + s)
 	return 0, err
+}
+
+func zoneNameLookup(i uint32, z *[]eqdbobject.Zone) (string, error) {
+	for _, d := range *z {
+		if d.Id == i {
+			return d.Long_name, nil
+		}
+	}
+	err := errors.New("Zone name not found in Zone data set: " + strconv.FormatUint(uint64(i), 10))
+	return "", err
 }

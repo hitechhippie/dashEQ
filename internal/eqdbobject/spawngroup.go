@@ -3,6 +3,7 @@ package eqdbobject
 // future spawngroup type implementations placeholder
 
 /*
+describe spawngroup;
 +---------------+---------------------+------+-----+---------+----------------+
 | Field         | Type                | Null | Key | Default | Extra          |
 +---------------+---------------------+------+-----+---------+----------------+

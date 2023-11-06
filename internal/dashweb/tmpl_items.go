@@ -1,6 +1,46 @@
 package dashweb
 
 const (
+	TmplItemsByZoneTop = `
+		<table class="data-table">
+			<thead>
+				<tr>
+					<th>Expansion</th>
+					<th>Zone</th>
+					<th>Items By Zone</th>
+				</tr>
+			</thead>
+			<tbody>{{ range .}}
+				<tr>
+					<td>{{ .Expansion }}</td>
+					<td><a href="/items.html?itemsbyzone={{ .Short_name }}">{{ .Name }}</a></td>
+				</tr>{{ end }}
+			</tbody>
+		</table>
+		<script type="text/javascript" src="/includes/tableSortable.js"></script>
+	`
+)
+
+const (
+	TmplItemsByZone = `
+		<table class="data-table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+				</tr>
+			</thead>
+			<tbody>{{ range .}}
+				<tr>
+					<td>{{ .Id }}</td>
+					<td>{{ .Name }}</td>
+				</tr>{{ end }}
+			</tbody>
+		</table>
+	`
+)
+
+const (
 	TmplItems = `
 		<table class="data-table">
 			<thead>

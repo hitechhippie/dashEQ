@@ -9,13 +9,19 @@ import (
 )
 
 // n = name of log category
-func InitLogger(n string) *log.Logger {
+func InitLogger(n string, overwrite bool) *log.Logger {
 	var logBuffer bytes.Buffer
 	var logFile *os.File
 	var logger *log.Logger
 	var err error
 
-	logFile, err = os.OpenFile("./logs/"+n+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if overwrite {
+		os.Truncate("./logs/"+n+".log", 0)
+		logFile, err = os.OpenFile("./logs/"+n+".log", os.O_RDWR|os.O_CREATE, 0666)
+	} else {
+		logFile, err = os.OpenFile("./logs/"+n+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	}
+
 	if err != nil {
 		fmt.Println("! Cannot open "+n+" log for writing:", err)
 		return nil

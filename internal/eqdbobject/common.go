@@ -42,6 +42,7 @@ func LoadDataNPC(c *eqdb.Connection) (*[]NPC, error) {
 		"id," + //Id uint32
 		"name," + //Name string
 		"level, " + //Level uint8
+		"maxlevel, " + //Maxlevel uint8
 		"race, " + //uint16
 		"class, " + //uint8
 		"hp, " + //uint32
@@ -67,7 +68,10 @@ func LoadDataNPC(c *eqdb.Connection) (*[]NPC, error) {
 	// iterate through the raw npc query data and populate the return object
 	for npcRows.Next() {
 		npc := new(NPC)
-		npcRows.Scan(&npc.Id, &npc.Name, &npc.Level, &npc.Race, &npc.Class, &npc.HP, &npc.Mana, &npc.LootTable, &npc.NPCSpells, &npc.NPCFaction, &npc.MinDmg, &npc.MaxDmg, &npc.AttackCount, &npc.RunSpeed, &npc.MR, &npc.CR, &npc.DR, &npc.FR, &npc.PR, &npc.AC)
+		npcRows.Scan(&npc.Id, &npc.Name, &npc.Level, &npc.MaxLevel, &npc.Race, &npc.Class, &npc.HP, &npc.Mana, &npc.LootTable, &npc.NPCSpells, &npc.NPCFaction, &npc.MinDmg, &npc.MaxDmg, &npc.AttackCount, &npc.RunSpeed, &npc.MR, &npc.CR, &npc.DR, &npc.FR, &npc.PR, &npc.AC)
+		if npc.MaxLevel == 0 {
+			npc.MaxLevel = npc.Level
+		}
 		npcSet = append(npcSet, *npc)
 	}
 	return &npcSet, nil
@@ -177,7 +181,7 @@ func LoadDataSpell(c *eqdb.Connection, e *config.ServerConfig) (*[]Spell, error)
 }
 
 func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
-	logOb := logging.InitLogger("eqobject-item")
+	logOb := logging.InitLogger("eqobject-item", true)
 
 	// initialize our return objects
 	itemSet := make([]Item, 0)
@@ -209,7 +213,7 @@ func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 		return nil, err
 	}
 
-	// iterate through the raw zone query data and populate the return object
+	// iterate through the raw item query data and populate the return object
 	for itemRows.Next() {
 		item := new(Item)
 		err = itemRows.Scan(
@@ -242,4 +246,142 @@ func LoadDataItem(c *eqdb.Connection) (*[]Item, error) {
 	}
 
 	return &itemSet, nil
+}
+
+func LoadDataSpawngroup(c *eqdb.Connection) (*[]Spawngroup, error) {
+	logOb := logging.InitLogger("eqobject-spawngroup", true)
+
+	// initialize our return objects
+	spawngroupSet := make([]Spawngroup, 0)
+
+	// gather the raw query data for zones
+	spawngroupRows, err := c.Target.Query("SELECT " +
+		"id," + //uint32
+		"name," + //string
+		"spawn_limit," + //uint8
+		"max_x," + //float32
+		"min_x," + //float32
+		"max_y," + //float32
+		"min_y," + //float32
+		"delay," + //uint32
+		"mindelay," + //uint32
+		"despawn," + //uint8
+		"despawn_timer," + //uint32
+		"wp_spawns " + //uint8
+		"FROM spawngroup")
+	if err != nil {
+		return nil, err
+	}
+
+	// iterate through the raw spawngroup query data and populate the return object
+	for spawngroupRows.Next() {
+		spawngroup := new(Spawngroup)
+		err = spawngroupRows.Scan(
+			&spawngroup.Id,
+			&spawngroup.Name,
+			&spawngroup.Spawn_limit,
+			&spawngroup.Max_x,
+			&spawngroup.Min_x,
+			&spawngroup.Max_y,
+			&spawngroup.Min_y,
+			&spawngroup.Delay,
+			&spawngroup.Mindelay,
+			&spawngroup.Despawn,
+			&spawngroup.Despawn_timer,
+			&spawngroup.Wp_spawns)
+		if err != nil {
+			logOb.Println(err)
+			return nil, err
+		}
+		logOb.Println(
+			spawngroup.Id,
+			spawngroup.Name,
+			spawngroup.Spawn_limit,
+			spawngroup.Max_x,
+			spawngroup.Min_x,
+			spawngroup.Min_y,
+			spawngroup.Max_y,
+			spawngroup.Delay,
+			spawngroup.Mindelay,
+			spawngroup.Despawn,
+			spawngroup.Despawn_timer,
+			spawngroup.Wp_spawns)
+		spawngroupSet = append(spawngroupSet, *spawngroup)
+	}
+
+	return &spawngroupSet, nil
+}
+
+func LoadDataSpawn2(c *eqdb.Connection) (*[]Spawn2, error) {
+	logOb := logging.InitLogger("eqobject-spawn2", true)
+
+	// initialize our return objects
+	spawn2Set := make([]Spawn2, 0)
+
+	// gather the raw query data for zones
+	spawn2Rows, err := c.Target.Query("SELECT " +
+		"id," + //uint32
+		"spawngroupID," + //uint32
+		"zone," + //string
+		"x," + //float32
+		"y," + //float32
+		"z," + //float32
+		"respawntime " + //uint32
+		"FROM spawn2")
+	if err != nil {
+		return nil, err
+	}
+
+	// iterate through the raw spawn2 query data and populate the return object
+	for spawn2Rows.Next() {
+		spawn2 := new(Spawn2)
+		err = spawn2Rows.Scan(
+			&spawn2.Id,
+			&spawn2.SpawngroupID,
+			&spawn2.Zone,
+			&spawn2.X,
+			&spawn2.Y,
+			&spawn2.Z,
+			&spawn2.RespawnTime)
+		if err != nil {
+			logOb.Println(err)
+			return nil, err
+		}
+		spawn2Set = append(spawn2Set, *spawn2)
+	}
+
+	return &spawn2Set, nil
+}
+
+func LoadDataSpawnEntry(c *eqdb.Connection) (*[]Spawnentry, error) {
+	logOb := logging.InitLogger("eqobject-spawnentry", true)
+
+	// initialize our return objects
+	spawnentrySet := make([]Spawnentry, 0)
+
+	// gather the raw query data for zones
+	spawnentryRows, err := c.Target.Query("SELECT " +
+		"spawngroupID," + //uint32
+		"npcID," + //uint32
+		"chance " + //uint8
+		"FROM spawnentry")
+	if err != nil {
+		return nil, err
+	}
+
+	// iterate through the raw spawn2 query data and populate the return object
+	for spawnentryRows.Next() {
+		spawnentry := new(Spawnentry)
+		err = spawnentryRows.Scan(
+			&spawnentry.SpawngroupID,
+			&spawnentry.NpcID,
+			&spawnentry.Chance)
+		if err != nil {
+			logOb.Println(err)
+			return nil, err
+		}
+		spawnentrySet = append(spawnentrySet, *spawnentry)
+	}
+
+	return &spawnentrySet, nil
 }

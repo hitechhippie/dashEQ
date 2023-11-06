@@ -21,6 +21,9 @@ var npcSet *[]eqdbobject.NPC
 var spellSet *[]eqdbobject.Spell
 var skillSet *[]eqdbobject.Skill
 var itemSet *[]eqdbobject.Item
+var spawngroupSet *[]eqdbobject.Spawngroup
+var spawn2Set *[]eqdbobject.Spawn2
+var spawnentrySet *[]eqdbobject.Spawnentry
 var questNPCset *[]eqquest.QuestNPC
 var questHearSet *[]eqquest.QuestHear
 
@@ -65,6 +68,9 @@ func main() {
 	srv.Skill = skillSet
 	srv.Spell = spellSet
 	srv.Item = itemSet
+	srv.Spawngroup = spawngroupSet
+	srv.Spawn2 = spawn2Set
+	srv.Spawnentry = spawnentrySet
 	srv.QuestNPC = questNPCset
 	srv.QuestHear = questHearSet
 
@@ -112,6 +118,24 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	}
 	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Items", Count: uint32(len(*itemSet)), LoadTime: time.Now().String()})
 
+	spawngroupSet, err = eqdbobject.LoadDataSpawngroup(c)
+	if err != nil {
+		return nil, err
+	}
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Spawn Groups", Count: uint32(len(*spawngroupSet)), LoadTime: time.Now().String()})
+
+	spawn2Set, err = eqdbobject.LoadDataSpawn2(c)
+	if err != nil {
+		return nil, err
+	}
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Spawn2 Entries", Count: uint32(len(*spawn2Set)), LoadTime: time.Now().String()})
+
+	spawnentrySet, err = eqdbobject.LoadDataSpawnEntry(c)
+	if err != nil {
+		return nil, err
+	}
+	dataSets = append(dataSets, eqdbobject.DataSet{Name: "Spawn Entries", Count: uint32(len(*spawnentrySet)), LoadTime: time.Now().String()})
+
 	questNPCset, err = eqquest.LoadDataQuestNPC(e.QuestDir, zoneSet, npcSet)
 	if err != nil {
 		return nil, err
@@ -133,6 +157,9 @@ func loadDataSets(c *eqdb.Connection, e *config.ServerConfig) (*[]eqdbobject.Dat
 	fmt.Println("* [DB] Loaded", len(*spellSet), "spells.")
 	fmt.Println("* [DB] Loaded", len(*skillSet), "skill entries.")
 	fmt.Println("* [DB] Loaded", len(*itemSet), "items.")
+	fmt.Println("* [DB] Loaded", len(*spawngroupSet), "spawn groups.")
+	fmt.Println("* [DB] Loaded", len(*spawn2Set), "spawn2 entries.")
+	fmt.Println("* [DB] Loaded", len(*spawnentrySet), "spawn entries.")
 	fmt.Println("* [Quest] Loaded", len(*questNPCset), "quest NPCs.")
 	fmt.Println("* [Quest] Loaded", len(*questHearSet), "quest hear/response statements.")
 

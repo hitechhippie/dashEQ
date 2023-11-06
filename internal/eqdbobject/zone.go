@@ -1,6 +1,65 @@
 package eqdbobject
 
-// future zone type implementations placeholder
+func (e ZoneExpansion) String() string {
+	switch e {
+	case 1:
+		return "Classic"
+	case 2:
+		return "The Ruins of Kunark"
+	case 3:
+		return "The Scars of Velious"
+	case 4:
+		return "The Shadows of Luclin"
+	case 5:
+		return "The Planes of Power"
+	case 6:
+		return "The Legacy of Ykesha"
+	case 7:
+		return "Lost Dungeons of Norrath"
+	case 8:
+		return "Gates of Discord"
+	case 9:
+		return "Omens of War"
+	case 10:
+		return "Dragons of Norrath"
+	case 11:
+		return "Depths of Darkhollow"
+	case 12:
+		return "Prophecy of Ro"
+	case 13:
+		return "The Serpent's Spine"
+	case 14:
+		return "The Buried Sea"
+	case 15:
+		return "Secrets of Faydwer"
+	case 16:
+		return "Seeds of Destruction"
+	case 17:
+		return "Underfoot"
+	case 18:
+		return "House of Thule"
+	case 19:
+		return "Veil of Alaris"
+	case 20:
+		return "Rain of Fear"
+	case 21:
+		return "Call of the Forsaken"
+	case 22:
+		return "The Darkened Sea"
+	case 23:
+		return "The Broken Mirror"
+	case 24:
+		return "Empires of Kunark"
+	case 25:
+		return "Ring of Scale"
+	case 26:
+		return "The Burning Lands"
+	case 27:
+		return "Torment of Velious"
+	default:
+		return "N/A"
+	}
+}
 
 /*
 +---------------------------+------------------------------+------+-----+---------+----------------+

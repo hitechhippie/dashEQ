@@ -11,15 +11,18 @@ type Zone struct {
 	Short_name string
 	Long_name  string
 	Outdoor    bool
-	Expansion  uint8
+	Expansion  ZoneExpansion
 }
+
+type ZoneExpansion uint8
 
 type NPC struct {
 	Id          uint32
 	Name        string
 	Lastname    string
 	Level       uint8
-	Race        uint16
+	MaxLevel    uint8
+	Race        NPCrace
 	Class       uint8
 	HP          uint32
 	Mana        uint32
@@ -37,6 +40,8 @@ type NPC struct {
 	PR          uint16
 	AC          uint16
 }
+
+type NPCrace uint16
 
 type Spell struct {
 	Id        uint32
@@ -71,7 +76,6 @@ type Spawngroup struct {
 	Id            uint32
 	Name          string
 	Spawn_limit   uint8
-	Dist          float32
 	Max_x         float32
 	Min_x         float32
 	Max_y         float32
@@ -81,6 +85,22 @@ type Spawngroup struct {
 	Despawn       uint8
 	Despawn_timer uint32
 	Wp_spawns     uint8
+}
+
+type Spawn2 struct {
+	Id           uint32
+	SpawngroupID uint32
+	Zone         string
+	X            float32
+	Y            float32
+	Z            float32
+	RespawnTime  uint32
+}
+
+type Spawnentry struct {
+	SpawngroupID uint32
+	NpcID        uint32
+	Chance       uint8
 }
 
 type ClassID uint8

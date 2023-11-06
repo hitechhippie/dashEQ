@@ -64,6 +64,7 @@ const (
                     </tr>{{end}}
                 </tbody>
         </table>
+        <script type="text/javascript" src="/includes/tableSortable.js"></script>
 `
 )
 
@@ -91,5 +92,6 @@ const (
                     </tr>{{end}}
                 </tbody>
         </table>
+        <script type="text/javascript" src="/includes/tableSortable.js"></script>
 `
 )

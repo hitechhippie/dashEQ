@@ -45,12 +45,7 @@ const (
                         <td>{{ .Short_name }}</td>
                         <td>{{ .Long_name }}</td>
                         <td>{{ if .Outdoor }}Yes{{ else }}No{{ end }}</td>
-                        <td>{{ if eq .Expansion 1 }}Original</td>
-                            {{ else if eq .Expansion 2 }}Ruins of Kunark</td>
-                            {{ else if eq .Expansion 3 }}Scars of Velious</td>
-                            {{ else if eq .Expansion 4 }}Shadows of Luclin</td>
-                            {{ else if eq .Expansion 5 }}Planes of Power</td>
-                            {{ else }}Unknown</td>{{ end }}
+                        <td>{{ .Expansion }}</td>
                     </tr>{{end}}
                 </tbody>
         </table>
