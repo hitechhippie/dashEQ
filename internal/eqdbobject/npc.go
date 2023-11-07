@@ -1,5 +1,10 @@
 package eqdbobject
 
+import (
+	"errors"
+	"strings"
+)
+
 func (r NPCrace) String() string {
 	switch r {
 	case 1:
@@ -1439,6 +1444,18 @@ func (r NPCrace) String() string {
 	default:
 		return "N/A"
 	}
+}
+
+// s = NPC name string determined from quest filename
+// d = the populated NPC slice with all the NPC data
+func NpcIdLookup(s string, n *[]NPC) (uint32, error) {
+	for _, d := range *n {
+		if strings.Compare(s, d.Name) == 0 {
+			return d.Id, nil
+		}
+	}
+	err := errors.New("NPC ID not found in NPC data set: " + s)
+	return 0, err
 }
 
 /*

@@ -1,5 +1,11 @@
 package eqdbobject
 
+import (
+	"errors"
+	"strconv"
+	"strings"
+)
+
 func (e ZoneExpansion) String() string {
 	switch e {
 	case 1:
@@ -59,6 +65,30 @@ func (e ZoneExpansion) String() string {
 	default:
 		return "N/A"
 	}
+}
+
+// s = Zone name string determined from current directory
+// d = the populated NPC slice with all the NPC data
+func ZoneIdLookup(s string, z *[]Zone) (uint32, error) {
+	for _, d := range *z {
+		if strings.Compare(s, d.Short_name) == 0 {
+			return d.Id, nil
+		}
+	}
+	err := errors.New("Zone ID not found in Zone data set: " + s)
+	return 0, err
+}
+
+// i = given zone id for lookup
+// z = populated Zone struct from requestor
+func ZoneNameLookup(i uint32, z *[]Zone) (string, error) {
+	for _, d := range *z {
+		if d.Id == i {
+			return d.Long_name, nil
+		}
+	}
+	err := errors.New("Zone name not found in Zone data set: " + strconv.FormatUint(uint64(i), 10))
+	return "", err
 }
 
 /*

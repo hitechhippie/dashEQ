@@ -5,13 +5,11 @@ import (
 	"bytes"
 	"dasheq/internal/eqdbobject"
 	"dasheq/internal/logging"
-	"errors"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -111,19 +109,19 @@ func processQuestFile(f string, d string, questNPCset []QuestNPC, zoneSet *[]eqd
 		qnpc.Name = filepath.Base(f)
 		qnpc.Name = regExLUA.ReplaceAllString(qnpc.Name, "")
 
-		qnpc.Id, err = npcIdLookup(qnpc.Name, npcSet)
+		qnpc.Id, err = eqdbobject.NpcIdLookup(qnpc.Name, npcSet)
 		if err != nil {
 			l.Println(err)
 			return questNPCset, nil
 		}
 
-		qnpc.Zone, err = zoneIdLookup(d, zoneSet)
+		qnpc.Zone, err = eqdbobject.ZoneIdLookup(d, zoneSet)
 		if err != nil {
 			l.Println(err)
 			return questNPCset, nil
 		}
 
-		qnpc.ZoneName, err = zoneNameLookup(qnpc.Zone, zoneSet)
+		qnpc.ZoneName, err = eqdbobject.ZoneNameLookup(qnpc.Zone, zoneSet)
 		if err != nil {
 			l.Println(err)
 			return questNPCset, nil
@@ -133,38 +131,4 @@ func processQuestFile(f string, d string, questNPCset []QuestNPC, zoneSet *[]eqd
 		return questNPCset, nil
 	}
 	return questNPCset, nil
-}
-
-// s = NPC name string determined from quest filename
-// d = the populated NPC slice with all the NPC data
-func npcIdLookup(s string, n *[]eqdbobject.NPC) (uint32, error) {
-	for _, d := range *n {
-		if strings.Compare(s, d.Name) == 0 {
-			return d.Id, nil
-		}
-	}
-	err := errors.New("NPC ID not found in NPC data set: " + s)
-	return 0, err
-}
-
-// s = Zone name string determined from current directory
-// d = the populated NPC slice with all the NPC data
-func zoneIdLookup(s string, z *[]eqdbobject.Zone) (uint32, error) {
-	for _, d := range *z {
-		if strings.Compare(s, d.Short_name) == 0 {
-			return d.Id, nil
-		}
-	}
-	err := errors.New("Zone ID not found in Zone data set: " + s)
-	return 0, err
-}
-
-func zoneNameLookup(i uint32, z *[]eqdbobject.Zone) (string, error) {
-	for _, d := range *z {
-		if d.Id == i {
-			return d.Long_name, nil
-		}
-	}
-	err := errors.New("Zone name not found in Zone data set: " + strconv.FormatUint(uint64(i), 10))
-	return "", err
 }

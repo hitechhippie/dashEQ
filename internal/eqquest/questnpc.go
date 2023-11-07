@@ -1,12 +1,6 @@
 package eqquest
 
-type QuestNPC struct {
-	Id       uint32
-	Name     string
-	Zone     uint32
-	ZoneName string
-	File     string
-}
+// type-specific implementations
 
 /*
 QuestNPC

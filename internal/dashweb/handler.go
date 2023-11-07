@@ -2,7 +2,6 @@ package dashweb
 
 import (
 	"bytes"
-	"dasheq/internal/config"
 	"dasheq/internal/eqdbobject"
 	"dasheq/internal/eqdbtransformation"
 	"dasheq/internal/eqquest"
@@ -15,21 +14,6 @@ import (
 	"strings"
 	"text/template"
 )
-
-type Server struct {
-	Config     *config.ServerConfig
-	DataSet    *[]eqdbobject.DataSet
-	Zone       *[]eqdbobject.Zone
-	NPC        *[]eqdbobject.NPC
-	Spell      *[]eqdbobject.Spell
-	Skill      *[]eqdbobject.Skill
-	Item       *[]eqdbobject.Item
-	Spawngroup *[]eqdbobject.Spawngroup
-	Spawn2     *[]eqdbobject.Spawn2
-	Spawnentry *[]eqdbobject.Spawnentry
-	QuestNPC   *[]eqquest.QuestNPC
-	QuestHear  *[]eqquest.QuestHear
-}
 
 // global server variable
 var srv Server
